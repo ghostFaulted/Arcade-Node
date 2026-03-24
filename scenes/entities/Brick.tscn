@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dahir5rv1lhf6"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ma223"]
+size = Vector2(64, 32)
+
+[node name="Brick" type="StaticBody2D" unique_id=978879397 groups=["brick"]]
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1122306059]
+offset_left = -32.0
+offset_top = -16.0
+offset_right = 32.0
+offset_bottom = 16.0
+color = Color(0, 1, 0, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=203349097]
+shape = SubResource("RectangleShape2D_ma223")

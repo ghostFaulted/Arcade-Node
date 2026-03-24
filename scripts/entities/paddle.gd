@@ -6,6 +6,7 @@ var half_width: float
 func _ready() -> void:
 	screen_width = get_viewport_rect().size.x
 	half_width = $CollisionShape2D.shape.size.x / 2.0
+	add_to_group("paddle")
 	
 func set_normalized_position(norm_x: float) -> void:
 	var target_x = norm_x * screen_width

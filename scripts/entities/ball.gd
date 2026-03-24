@@ -1,12 +1,27 @@
 extends CharacterBody2D
 
-@export var speed: float = 600.0
+@export var speed: float = 800.0
 @export var direction: Vector2 = Vector2.ZERO
+const MAX_BOUNCE_ANGLE: float = PI / 3.0
 
 # Physics of the Ball
 func _physics_process(delta: float) -> void:
-	var speed_vector = direction * speed
-	var collision = move_and_collide(speed_vector * delta)
-	if collision:
+	var movement = direction * speed * delta
+	for i in range(4):
+		var collision = move_and_collide(movement)
+		if not collision:
+			break
+		var collider = collision.get_collider()
 		var normal = collision.get_normal()
-		direction = direction.bounce(normal).normalized()
+		if collider.is_in_group("paddle") and normal.y < -0.5 and direction.y > 0:
+			var offset = global_position.x - collider.global_position.x
+			var normalized_offset = clampf(offset / collider.half_width, -1.0, 1.0)
+			var bounce_angle = normalized_offset * MAX_BOUNCE_ANGLE
+			direction = Vector2.UP.rotated(bounce_angle).normalized()
+		else:
+			direction = direction.bounce(collision.get_normal()).normalized()
+		var remainder = collision.get_remainder()
+		movement = direction * remainder.length()
+
+func _ready() -> void:
+	direction = direction.normalized()
