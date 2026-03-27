@@ -9,4 +9,5 @@ func _ready() -> void:
 func take_damage(amount: int) -> void:
 	current_hp -= amount
 	if current_hp <= 0:
+		Events.brick_destroyed.emit(10)
 		queue_free()

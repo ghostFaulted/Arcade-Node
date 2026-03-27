@@ -17,3 +17,9 @@ func _ready() -> void:
 	#BottomZone 
 	$Killzone/BottomZone.shape.size = Vector2(screen_size.x, thickness)
 	$Killzone/BottomZone.position = Vector2(screen_size.x / 2.0, screen_size.y + thickness / 2.0)
+
+
+func _on_killzone_body_entered(body: Node2D) -> void:
+	if body.is_in_group("ball"):
+		body.queue_free()
+		Events.ball_lost.emit()

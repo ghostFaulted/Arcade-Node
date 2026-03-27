@@ -3,8 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://jx7rc7mrpr3o" path="res://scenes/levels/LevelBounds.tscn" id="1_rvslj"]
 [ext_resource type="PackedScene" uid="uid://c5scglfiyf63n" path="res://scenes/entities/Ball.tscn" id="2_0bbpv"]
 [ext_resource type="PackedScene" uid="uid://btakm34optrdn" path="res://scenes/entities/Paddle.tscn" id="3_rarhs"]
+[ext_resource type="Script" uid="uid://br83oshjrewfw" path="res://scripts/core/level_generator.gd" id="4_c01mt"]
 [ext_resource type="PackedScene" uid="uid://bfyj2ke0va5bl" path="res://scenes/ui/TouchArena.tscn" id="4_vcsgt"]
-[ext_resource type="PackedScene" uid="uid://dahir5rv1lhf6" path="res://scenes/entities/Brick.tscn" id="5_vcsgt"]
 
 [node name="Main" type="Node" unique_id=1818715696]
 
@@ -17,28 +17,13 @@ direction = Vector2(1, -1)
 [node name="Paddle" parent="." unique_id=711358604 instance=ExtResource("3_rarhs")]
 position = Vector2(355, 1035)
 
+[node name="LevelGenerator" type="Node2D" parent="." unique_id=1797801693]
+script = ExtResource("4_c01mt")
+
 [node name="TouchArena" parent="." unique_id=160275338 instance=ExtResource("4_vcsgt")]
 offset_left = 4.0
 offset_top = 911.0
 offset_right = 724.0
 offset_bottom = 1211.0
-
-[node name="Brick" parent="." unique_id=978879397 instance=ExtResource("5_vcsgt")]
-position = Vector2(84, 71)
-
-[node name="Brick2" parent="." unique_id=295030850 instance=ExtResource("5_vcsgt")]
-position = Vector2(665, 131)
-
-[node name="Brick3" parent="." unique_id=1375689487 instance=ExtResource("5_vcsgt")]
-position = Vector2(81, 202)
-
-[node name="Brick4" parent="." unique_id=918631139 instance=ExtResource("5_vcsgt")]
-position = Vector2(664, 186)
-
-[node name="Brick5" parent="." unique_id=622112732 instance=ExtResource("5_vcsgt")]
-position = Vector2(82, 139)
-
-[node name="Brick6" parent="." unique_id=321335886 instance=ExtResource("5_vcsgt")]
-position = Vector2(666, 71)
 
 [connection signal="paddle_moved" from="TouchArena" to="Paddle" method="set_normalized_position"]

@@ -7,6 +7,7 @@ const MAX_BOUNCE_ANGLE: float = PI / 3.0
 # Physics of the Ball
 func _physics_process(delta: float) -> void:
 	var movement = direction * speed * delta
+	var has_damaged: bool = false
 	for i in range(4):
 		var collision = move_and_collide(movement)
 		if not collision:
@@ -14,7 +15,9 @@ func _physics_process(delta: float) -> void:
 		var collider = collision.get_collider()
 		var normal = collision.get_normal()
 		if collider.has_method("take_damage"):
-			collider.take_damage(1)
+			if not has_damaged:
+				collider.take_damage(1)
+				has_damaged = true
 		if collider.is_in_group("paddle") and normal.y < -0.5 and direction.y > 0:
 			var offset = global_position.x - collider.global_position.x
 			var normalized_offset = clampf(offset / collider.half_width, -1.0, 1.0)
