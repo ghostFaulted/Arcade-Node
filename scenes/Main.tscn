@@ -1,18 +1,14 @@
 [gd_scene format=3 uid="uid://bwmnnfctcnel5"]
 
 [ext_resource type="PackedScene" uid="uid://jx7rc7mrpr3o" path="res://scenes/levels/LevelBounds.tscn" id="1_rvslj"]
-[ext_resource type="PackedScene" uid="uid://c5scglfiyf63n" path="res://scenes/entities/Ball.tscn" id="2_0bbpv"]
 [ext_resource type="PackedScene" uid="uid://btakm34optrdn" path="res://scenes/entities/Paddle.tscn" id="3_rarhs"]
 [ext_resource type="Script" uid="uid://br83oshjrewfw" path="res://scripts/core/level_generator.gd" id="4_c01mt"]
 [ext_resource type="PackedScene" uid="uid://bfyj2ke0va5bl" path="res://scenes/ui/TouchArena.tscn" id="4_vcsgt"]
+[ext_resource type="Script" uid="uid://dbbbdodt1qoqr" path="res://scripts/core/game_manager.gd" id="5_vcsgt"]
 
 [node name="Main" type="Node" unique_id=1818715696]
 
 [node name="LevelBounds" parent="." unique_id=232839248 instance=ExtResource("1_rvslj")]
-
-[node name="Ball" parent="." unique_id=594510742 instance=ExtResource("2_0bbpv")]
-position = Vector2(350, 777)
-direction = Vector2(1, -1)
 
 [node name="Paddle" parent="." unique_id=711358604 instance=ExtResource("3_rarhs")]
 position = Vector2(355, 1035)
@@ -25,5 +21,12 @@ offset_left = 4.0
 offset_top = 911.0
 offset_right = 724.0
 offset_bottom = 1211.0
+
+[node name="BallSpawnPoint" type="Marker2D" parent="." unique_id=146329283]
+position = Vector2(354, 897)
+
+[node name="GameManager" type="Node" parent="." unique_id=642766169 node_paths=PackedStringArray("spawn_point")]
+script = ExtResource("5_vcsgt")
+spawn_point = NodePath("../BallSpawnPoint")
 
 [connection signal="paddle_moved" from="TouchArena" to="Paddle" method="set_normalized_position"]

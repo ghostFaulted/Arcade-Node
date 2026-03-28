@@ -5,7 +5,7 @@ const BrickScene = preload("res://scenes/entities/Brick.tscn")
 @export var rows: int = 4
 
 @export var margin_top: float = 150.0
-@export var gap: Vector2 = Vector2(10.0, 10.0)
+@export var gap: Vector2 = Vector2(0.0, 0.0)
 
 const BRICK_SIZE = Vector2(64.0, 32.0)
 
