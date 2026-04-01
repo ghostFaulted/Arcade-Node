@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://br83oshjrewfw" path="res://scripts/core/level_generator.gd" id="4_c01mt"]
 [ext_resource type="PackedScene" uid="uid://bfyj2ke0va5bl" path="res://scenes/ui/TouchArena.tscn" id="4_vcsgt"]
 [ext_resource type="Script" uid="uid://dbbbdodt1qoqr" path="res://scripts/core/game_manager.gd" id="5_vcsgt"]
+[ext_resource type="PackedScene" uid="uid://cag76k7bbtimi" path="res://scenes/ui/HUD.tscn" id="6_c01mt"]
 
 [node name="Main" type="Node" unique_id=1818715696]
 
@@ -28,5 +29,7 @@ position = Vector2(354, 897)
 [node name="GameManager" type="Node" parent="." unique_id=642766169 node_paths=PackedStringArray("spawn_point")]
 script = ExtResource("5_vcsgt")
 spawn_point = NodePath("../BallSpawnPoint")
+
+[node name="Hud" parent="." unique_id=2132756405 instance=ExtResource("6_c01mt")]
 
 [connection signal="paddle_moved" from="TouchArena" to="Paddle" method="set_normalized_position"]

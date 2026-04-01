@@ -11,12 +11,15 @@ func _ready() -> void:
 	Events.brick_destroyed.connect(_on_brick_destroyed)
 	Events.ball_lost.connect(_on_ball_lost)
 	Events.level_ready.connect(_on_level_ready)
-	print("Game started. Lives: ", lives)
+	Events.score_updated.emit.call_deferred(0)
+	Events.lives_updated.emit.call_deferred(3)
+	#print("Game started. Lives: ", lives)
 	spawn_ball()
 	
 func _on_brick_destroyed(points: int) -> void:
 	score += points
-	print("Score: ", score)
+	Events.score_updated.emit(score)
+	#print("Score: ", score)
 	bricks_remaining -= 1
 	if bricks_remaining <= 0:
 		print("Level completed!")
@@ -24,7 +27,8 @@ func _on_brick_destroyed(points: int) -> void:
 	
 func _on_ball_lost() -> void:
 	lives -= 1
-	print("Ball lost! Lives remaining: ", lives)
+	Events.lives_updated.emit(lives)
+	#print("Ball lost! Lives remaining: ", lives)
 	if lives > 0:
 		spawn_ball()
 	else:
