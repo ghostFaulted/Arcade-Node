@@ -23,3 +23,6 @@ func _ready() -> void:
 			var pos_y = start_center_y + r * (BRICK_SIZE.y + gap.y)
 			brick.position = Vector2(pos_x, pos_y)
 			add_child(brick)
+			
+	var total_blocks_numer = rows * columns
+	Events.level_ready.emit.call_deferred(total_blocks_numer)
