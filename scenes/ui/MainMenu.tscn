@@ -20,7 +20,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0.54509807, 1)
 
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1401697017]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1164867116]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,18 +28,21 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=1350387931]
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer" unique_id=1401697017]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/CenterContainer" unique_id=1350387931]
 layout_mode = 2
 theme_override_constants/separation = 50
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1366514232]
+[node name="TitleLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer" unique_id=1366514232]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Arcade Node++"
 
-[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1879052034]
+[node name="StartButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer" unique_id=1879052034]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Start"
 
-[connection signal="pressed" from="CenterContainer/VBoxContainer/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/StartButton" to="." method="_on_start_button_pressed"]

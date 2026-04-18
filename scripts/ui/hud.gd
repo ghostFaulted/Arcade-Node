@@ -8,6 +8,7 @@ func _ready() -> void:
 	Events.game_over.connect(_on_game_over)
 	Events.level_completed.connect(_on_level_completed)
 	Events.layout_calculated.connect(_on_layout_calculated)
+	apply_safe_area()
 
 func _on_score_updated(new_score: int) -> void:
 	$MarginContainer/HBoxContainer/ScoreLabel.text = "Score: " + str(new_score)
@@ -52,3 +53,14 @@ func _on_resume_button_pressed() -> void:
 func _on_menu_button_pressed() -> void:
 	get_tree().paused = false
 	get_tree().change_scene_to_file("res://scenes/ui/LevelSelection.tscn")
+	
+func apply_safe_area() -> void:
+	var safe_area = DisplayServer.get_display_safe_area()
+	var window_size = DisplayServer.screen_get_size()
+	if window_size.y == 0: return
+	var top_ratio = float(safe_area.position.y) / float(window_size.y)
+	var viewport_height = get_viewport().get_visible_rect().size.y
+	var safe_margin_top = top_ratio * viewport_height
+	$MarginContainer.add_theme_constant_override("margin_top", 20 + safe_margin_top)
+	
+	
