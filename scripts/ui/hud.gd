@@ -36,8 +36,9 @@ func _on_paddle_controller_value_changed(value: float) -> void:
 	
 func _on_layout_calculated(screen_size: Vector2, slider_y: float, paddle_y: float) -> void:
 	$CustomSlider.size.x = screen_size.x
-	$CustomSlider.size.y = 100.0
+	$CustomSlider.size.y = 120.0
 	$CustomSlider.position.y = slider_y
+	$CustomSlider.queue_redraw()
 
 func _on_pause_button_pressed() -> void:
 	if is_game_over: return
@@ -62,5 +63,8 @@ func apply_safe_area() -> void:
 	var viewport_height = get_viewport().get_visible_rect().size.y
 	var safe_margin_top = top_ratio * viewport_height
 	$MarginContainer.add_theme_constant_override("margin_top", 20 + safe_margin_top)
-	
-	
+
+func _on_pause_restart_button_pressed() -> void:
+	get_tree().paused = false
+	is_game_over = false
+	get_tree().reload_current_scene()

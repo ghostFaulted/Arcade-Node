@@ -6,7 +6,7 @@
 size = Vector2(120, 30)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jv2mh"]
-size = Vector2(120, 30)
+size = Vector2(120, 150)
 
 [node name="Paddle" type="AnimatableBody2D" unique_id=711358604]
 sync_to_physics = false
@@ -16,4 +16,5 @@ script = ExtResource("1_jv2mh")
 texture = SubResource("PlaceholderTexture2D_80l0o")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1160385076]
+position = Vector2(0, 60)
 shape = SubResource("RectangleShape2D_jv2mh")
