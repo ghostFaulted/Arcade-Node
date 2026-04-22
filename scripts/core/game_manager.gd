@@ -44,7 +44,7 @@ func spawn_ball() -> void:
 	var paddle = get_tree().get_first_node_in_group("paddle")
 	ball.attach_node = paddle
 	get_parent().call_deferred("add_child", ball)
-	await get_tree().create_timer(1.0).timeout
-	if is_instance_valid(ball):
-		ball.is_launched = true
-		ball.direction = Vector2.UP
+	
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch and event.is_pressed():
+		Events.ball_launched.emit()

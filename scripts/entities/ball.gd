@@ -36,3 +36,9 @@ func _physics_process(delta: float) -> void:
 
 func _ready() -> void:
 	direction = direction.normalized()
+	Events.ball_launched.connect(_on_launch)
+	
+func _on_launch() -> void:
+	if not is_launched:
+		is_launched = true
+		direction = Vector2.UP

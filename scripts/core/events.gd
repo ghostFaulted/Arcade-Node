@@ -9,3 +9,4 @@ signal game_over
 signal level_completed
 signal layout_calculated(screen_size: Vector2, slider_y: float, paddle_y: float)
 signal paddle_exact_x_moved(target_x: float)
+signal ball_launched
