@@ -1,18 +1,24 @@
 extends CharacterBody2D
 
-@export var speed: float = 800.0
+@export var min_speed: float = 700.0
+@export var max_speed: float = 1100.0
+@export var speed_step: float = 7.5
 @export var direction: Vector2 = Vector2.ZERO
 const MAX_BOUNCE_ANGLE: float = PI / 3.0
 var is_launched: bool = false
 var attach_node: Node2D
 
-# Physics of the Ball
+var current_speed: float:
+	set(value):
+		current_speed = clampf(value, min_speed, max_speed)
+		print("[DEBUG] Ball Speed: ", current_speed)
+
 func _physics_process(delta: float) -> void:
 	if not is_launched:
 		if is_instance_valid(attach_node):
 			global_position = attach_node.global_position - Vector2(0, 30)
 		return
-	var movement = direction * speed * delta
+	var movement = direction * current_speed * delta
 	var has_damaged: bool = false
 	for i in range(4):
 		var collision = move_and_collide(movement)
@@ -20,21 +26,31 @@ func _physics_process(delta: float) -> void:
 			break
 		var collider = collision.get_collider()
 		var normal = collision.get_normal()
-		if collider.has_method("take_damage"):
-			if not has_damaged:
-				collider.take_damage(1)
-				has_damaged = true
 		if collider.is_in_group("paddle") and normal.y < -0.5 and direction.y > 0:
 			var offset = global_position.x - collider.global_position.x
 			var normalized_offset = clampf(offset / collider.half_width, -1.0, 1.0)
 			var bounce_angle = normalized_offset * MAX_BOUNCE_ANGLE
 			direction = Vector2.UP.rotated(bounce_angle).normalized()
 		else:
-			direction = direction.bounce(collision.get_normal()).normalized()
+			direction = direction.bounce(normal).normalized()
+		if abs(direction.y) < 0.2:
+			var dir_sign = sign(direction.y) if direction.y != 0 else 1.0
+			direction.y = 0.2 * dir_sign
+			direction = direction.normalized()
+		if collider.has_method("take_damage"):
+			if not has_damaged:
+				collider.take_damage(1)
+				has_damaged = true
+				current_speed += speed_step
+		elif collider.is_in_group("paddle"):
+			current_speed += speed_step
+		elif normal.y > 0.8:
+			current_speed += (5.0 * speed_step) 
 		var remainder = collision.get_remainder()
 		movement = direction * remainder.length()
 
 func _ready() -> void:
+	current_speed = min_speed
 	direction = direction.normalized()
 	Events.ball_launched.connect(_on_launch)
 	
