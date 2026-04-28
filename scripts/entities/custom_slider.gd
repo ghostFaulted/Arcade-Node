@@ -14,7 +14,7 @@ func _ready() -> void:
 	var margin = track_radius + (track_thickness / 2.0)
 	var target_x = clampf(center_x, margin, size.x - margin)
 	knob.position.x = target_x - (knob.size.x / 2.0)
-	Events.paddle_exact_x_moved.emit(target_x)
+	Events.paddle_exact_x_moved.emit(global_position.x + target_x)
 
 func _gui_input(event: InputEvent) -> void:
 	if get_tree().paused:
@@ -26,7 +26,7 @@ func _gui_input(event: InputEvent) -> void:
 		var margin = track_radius + (track_thickness / 2.0)
 		var target_x = clampf(touch_x, margin, size.x - margin)
 		knob.position.x = target_x - (knob.size.x / 2.0)
-		Events.paddle_exact_x_moved.emit(target_x)
+		Events.paddle_exact_x_moved.emit(global_position.x + target_x)
 		
 func _draw() -> void:
 	var center_y = size.y / 2.0

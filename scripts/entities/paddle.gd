@@ -12,12 +12,12 @@ func _ready() -> void:
 	Events.paddle_exact_x_moved.connect(_on_exact_x_moved)
 	Events.layout_calculated.connect(_on_layout_calculated)
 
-func _on_layout_calculated(screen_size: Vector2, slider_y: float, paddle_y: float) -> void:
-	screen_width = screen_size.x
+func _on_layout_calculated(play_area: Rect2, slider_y: float, paddle_y: float) -> void:
+	screen_width = play_area.size.x
 	half_width = $CollisionShape2D.shape.size.x / 2.0
-	min_x = half_width
-	max_x = screen_width - min_x
-	target_x = screen_width / 2.0
+	min_x = play_area.position.x + half_width
+	max_x = play_area.position.x + play_area.size.x - half_width
+	target_x = play_area.position.x + play_area.size.x / 2.0
 	target_y = paddle_y
 
 func _on_exact_x_moved(new_x: float) -> void:

@@ -10,7 +10,7 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vaihy"]
 
-[node name="LevelBounds" type="Node" unique_id=232839248]
+[node name="LevelBounds" type="Node2D" unique_id=981863865]
 script = ExtResource("1_nhcll")
 
 [node name="Walls" type="StaticBody2D" parent="." unique_id=1167562948]
