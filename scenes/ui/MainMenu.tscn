@@ -45,4 +45,23 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Start"
 
+[node name="ExitButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer" unique_id=2128830088]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "EXIT"
+
+[node name="VersionLabel" type="Label" parent="." unique_id=1139084247]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -23.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 16
+
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/ExitButton" to="." method="_on_exit_button_pressed"]

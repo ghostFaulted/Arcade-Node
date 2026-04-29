@@ -111,6 +111,7 @@ layout_mode = 3
 anchors_preset = 0
 offset_bottom = 100.0
 script = ExtResource("2_atyv1")
+paddle_half_width = 45.0
 
 [node name="Knob" type="Control" parent="CustomSlider" unique_id=1196959492]
 anchors_preset = 0

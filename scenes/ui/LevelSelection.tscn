@@ -35,6 +35,11 @@ layout_mode = 2
 layout_mode = 2
 theme_override_constants/separation = 50
 
+[node name="BackButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer" unique_id=294506999]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Back to Menu"
+
 [node name="Label" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer" unique_id=442416932]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
@@ -64,6 +69,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "3"
 
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/GridContainer/BtnLevel1" to="." method="_on_btn_level_1_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/GridContainer/BtnLevel2" to="." method="_on_btn_level_2_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/GridContainer/BtnLevel3" to="." method="_on_btn_level_3_pressed"]

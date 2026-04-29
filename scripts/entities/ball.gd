@@ -58,3 +58,7 @@ func _on_launch() -> void:
 	if not is_launched:
 		is_launched = true
 		direction = Vector2.UP
+		
+func _draw() -> void:
+	var radius = $CollisionShape2D.shape.radius
+	draw_circle(Vector2.ZERO, radius, Color.YELLOW)
