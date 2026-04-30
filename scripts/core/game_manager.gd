@@ -13,7 +13,7 @@ func _ready() -> void:
 	Events.lives_updated.emit.call_deferred(3)
 	await get_tree().process_frame
 	var screen_size = get_viewport().get_visible_rect().size
-	var side_margin = 20.0
+	var side_margin = 10.0
 	var play_width = screen_size.x - (side_margin * 2.0)
 	var play_area = Rect2(side_margin, 0, play_width, screen_size.y)
 	var paddle_y = screen_size.y * 0.65

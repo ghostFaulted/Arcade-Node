@@ -78,7 +78,9 @@ func _on_pause_restart_button_pressed() -> void:
 func _on_ball_spawned() -> void:
 	is_waiting_for_launch = true
 	$CenterContainer/HintLabel.visible = false
-	await get_tree().create_timer(4.0).timeout
+	await get_tree().create_timer(4.0, false).timeout
+	if not is_inside_tree():
+		return
 	if is_waiting_for_launch and not is_game_over:
 		$CenterContainer/HintLabel.visible = true
 		
