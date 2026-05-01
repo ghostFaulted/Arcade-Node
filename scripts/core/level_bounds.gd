@@ -10,16 +10,16 @@ func _on_layout_calculated(play_area: Rect2, slider_y: float, paddle_y: float) -
 	var thickness = 100.0
 	#TopWall
 	$Walls/TopWall.shape.size = Vector2(play_area.size.x + thickness * 2.0, thickness)
-	$Walls/TopWall.global_position = Vector2(play_area.position.x + play_area.size.x / 2.0, -thickness / 2.0)
+	$Walls/TopWall.global_position = Vector2(play_area.position.x + play_area.size.x / 2.0, play_area.position.y - (thickness / 2.0))
 	#LeftWall
 	$Walls/LeftWall.shape.size = Vector2(thickness, play_area.size.y * 2.0)
-	$Walls/LeftWall.global_position = Vector2(play_area.position.x - thickness / 2.0, play_area.size.y)
+	$Walls/LeftWall.global_position = Vector2(play_area.position.x - thickness / 2.0, play_area.position.y + play_area.size.y / 2.0)
 	#RightWall
 	$Walls/RightWall.shape.size = Vector2(thickness, play_area.size.y * 2.0)
-	$Walls/RightWall.global_position = Vector2(play_area.position.x + play_area.size.x + thickness / 2.0, play_area.size.y)
+	$Walls/RightWall.global_position = Vector2(play_area.position.x + play_area.size.x + thickness / 2.0, play_area.position.y + play_area.size.y / 2.0)
 	#BottomZone 
 	$Killzone/BottomZone.shape.size = Vector2(play_area.size.x + thickness * 2.0, thickness)
-	$Killzone/BottomZone.global_position = Vector2(play_area.position.x + play_area.size.x / 2.0, slider_y + 150.0)
+	$Killzone/BottomZone.global_position = Vector2(play_area.position.x + play_area.size.x / 2.0, play_area.position.y + play_area.size.y + 100.0)
 	queue_redraw()
 	
 func _draw() -> void:

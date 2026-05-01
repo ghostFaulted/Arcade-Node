@@ -23,6 +23,6 @@ func _on_layout_calculated(play_area: Rect2, slider_y: float, paddle_y: float) -
 func _on_exact_x_moved(new_x: float) -> void:
 	target_x = clampf(new_x, min_x, max_x)
 
-func _physics_process(delta: float) -> void:
+func _process(delta: float) -> void:
 	if screen_width > 0:
 		global_position = Vector2(target_x, target_y)

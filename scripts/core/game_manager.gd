@@ -14,8 +14,10 @@ func _ready() -> void:
 	await get_tree().process_frame
 	var screen_size = get_viewport().get_visible_rect().size
 	var side_margin = 10.0
+	var top_margin = 60.0
 	var play_width = screen_size.x - (side_margin * 2.0)
-	var play_area = Rect2(side_margin, 0, play_width, screen_size.y)
+	var play_height = screen_size.y - top_margin
+	var play_area = Rect2(side_margin, top_margin, play_width, play_height)
 	var paddle_y = screen_size.y * 0.65
 	var slider_y = paddle_y + 50.0
 	Events.layout_calculated.emit(play_area, slider_y, paddle_y)
