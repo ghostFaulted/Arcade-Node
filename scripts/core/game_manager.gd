@@ -19,7 +19,7 @@ func _ready() -> void:
 	var play_height = screen_size.y - top_margin
 	var play_area = Rect2(side_margin, top_margin, play_width, play_height)
 	var paddle_y = screen_size.y * 0.65
-	var slider_y = paddle_y + 50.0
+	var slider_y = paddle_y + 75.0
 	Events.layout_calculated.emit(play_area, slider_y, paddle_y)
 	spawn_ball()
 	

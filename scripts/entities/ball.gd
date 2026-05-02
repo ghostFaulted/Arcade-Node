@@ -11,6 +11,8 @@ var attach_node: Node2D
 var current_speed: float:
 	set(value):
 		current_speed = clampf(value, min_speed, max_speed)
+		var ratio = (current_speed - min_speed) / (max_speed - min_speed)
+		Events.speed_updated.emit(ratio)
 		print("[DEBUG] Ball Speed: ", current_speed)
 
 func _physics_process(delta: float) -> void:
@@ -51,6 +53,7 @@ func _physics_process(delta: float) -> void:
 
 func _ready() -> void:
 	current_speed = min_speed
+	Events.speed_updated.emit(0.0)
 	direction = direction.normalized()
 	Events.ball_launched.connect(_on_launch)
 	

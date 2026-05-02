@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://btakm34optrdn"]
 
 [ext_resource type="Script" uid="uid://b6dd56umkq10t" path="res://scripts/entities/paddle.gd" id="1_jv2mh"]
+[ext_resource type="Script" uid="uid://6bgsfnc58uv2" path="res://scripts/entities/speedometer.gd" id="2_rxl3r"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_80l0o"]
 size = Vector2(110, 20)
@@ -19,3 +20,6 @@ texture = SubResource("PlaceholderTexture2D_80l0o")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1160385076]
 position = Vector2(0, 20)
 shape = SubResource("RectangleShape2D_jv2mh")
+
+[node name="Speedometer" type="Node2D" parent="." unique_id=1515675942]
+script = ExtResource("2_rxl3r")
