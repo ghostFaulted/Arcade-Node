@@ -115,12 +115,11 @@ paddle_half_width = 55.0
 
 [node name="Knob" type="Control" parent="CustomSlider" unique_id=1196959492]
 anchors_preset = 0
-offset_right = 100.0
-offset_bottom = 100.0
+offset_right = 120.0
+offset_bottom = 120.0
 mouse_filter = 2
 theme = SubResource("Theme_kw0id")
 script = ExtResource("3_6ll6g")
-knob_radius = 48.0
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=811833202]
 anchors_preset = 15

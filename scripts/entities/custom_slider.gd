@@ -2,8 +2,8 @@ extends Control
 
 @export var paddle_half_width: float = 60.0
 @export var track_color: Color = Color.WHITE
-@export var track_thickness: float = 4.0
-@export var track_radius: float = 50.0
+@export var track_thickness: float = 6.0
+@export var track_radius: float = 60.0
 @onready var knob = $Knob
 
 func _ready() -> void:

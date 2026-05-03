@@ -40,7 +40,7 @@ func _on_paddle_controller_value_changed(value: float) -> void:
 func _on_layout_calculated(play_area: Rect2, slider_y: float, paddle_y: float) -> void:
 	$CustomSlider.size.x = play_area.size.x
 	$CustomSlider.position.x = play_area.position.x
-	$CustomSlider.size.y = 100.0
+	$CustomSlider.size.y = 130.0
 	$CustomSlider.position.y = slider_y
 	$CustomSlider.queue_redraw()
 	$MarginContainer.add_theme_constant_override("margin_left", play_area.position.x + 20)

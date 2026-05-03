@@ -10,7 +10,6 @@ size = Vector2(110, 20)
 size = Vector2(110, 60)
 
 [node name="Paddle" type="AnimatableBody2D" unique_id=711358604]
-physics_interpolation_mode = 2
 sync_to_physics = false
 script = ExtResource("1_jv2mh")
 

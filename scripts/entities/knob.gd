@@ -1,7 +1,7 @@
 extends Control
 
 @export var knob_color: Color = Color.RED
-@export var knob_radius: float = 50.0
+@export var knob_radius: float = 60.0
 @export var is_hollow: bool = false
 @export var line_thickness: float = 4.0
 
