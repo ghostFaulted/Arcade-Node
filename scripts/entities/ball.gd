@@ -6,7 +6,15 @@ extends CharacterBody2D
 @export var direction: Vector2 = Vector2.ZERO
 const MAX_BOUNCE_ANGLE: float = PI / 3.0
 var is_launched: bool = false
-var attach_node: Node2D
+var attach_offset_y: float = 0.0
+var attach_node: Node2D:
+	set(value):
+		attach_node = value
+		if is_instance_valid(attach_node):
+			var paddle_col = attach_node.get_node("CollisionShape2D")
+			var paddle_thickness = paddle_col.shape.size.y 
+			var ball_radius = $CollisionShape2D.shape.radius
+			attach_offset_y = (paddle_thickness / 2.0) + ball_radius
 
 var current_speed: float:
 	set(value):
@@ -15,11 +23,14 @@ var current_speed: float:
 		Events.speed_updated.emit(ratio)
 		print("[DEBUG] Ball Speed: ", current_speed)
 
+func _process(delta: float) -> void:
+	if not is_launched and is_instance_valid(attach_node):
+		var col_pos = attach_node.get_node("CollisionShape2D").global_position
+		global_position = col_pos - Vector2(0, attach_offset_y)
+
 func _physics_process(delta: float) -> void:
 	if not is_launched:
-		if is_instance_valid(attach_node):
-			global_position = attach_node.global_position - Vector2(0, 30)
-		return
+		return  
 	var movement = direction * current_speed * delta
 	var has_damaged: bool = false
 	for i in range(4):
@@ -28,11 +39,18 @@ func _physics_process(delta: float) -> void:
 			break
 		var collider = collision.get_collider()
 		var normal = collision.get_normal()
-		if collider.is_in_group("paddle") and normal.y < -0.5 and direction.y > 0:
-			var offset = global_position.x - collider.global_position.x
-			var normalized_offset = clampf(offset / collider.half_width, -1.0, 1.0)
-			var bounce_angle = normalized_offset * MAX_BOUNCE_ANGLE
-			direction = Vector2.UP.rotated(bounce_angle).normalized()
+		if collider.is_in_group("paddle"):
+			if normal.y < -0.5 and direction.y > 0:
+				var offset = global_position.x - collider.global_position.x
+				var normalized_offset = clampf(offset / collider.half_width, -1.0, 1.0)
+				var bounce_angle = normalized_offset * MAX_BOUNCE_ANGLE
+				direction = Vector2.UP.rotated(bounce_angle).normalized()
+				current_speed += speed_step 
+			else:
+				direction = direction.bounce(normal).normalized()
+				direction.y = -abs(direction.y) - 0.5
+				direction = direction.normalized()
+				global_position.y -= 3.0
 		else:
 			direction = direction.bounce(normal).normalized()
 		if abs(direction.y) < 0.2:
@@ -44,10 +62,8 @@ func _physics_process(delta: float) -> void:
 				collider.take_damage(1)
 				has_damaged = true
 				current_speed += speed_step
-		elif collider.is_in_group("paddle"):
-			current_speed += speed_step
-		elif normal.y > 0.8:
-			current_speed += (5.0 * speed_step) 
+		elif not collider.is_in_group("paddle") and normal.y > 0.8:
+			current_speed += (5.0 * speed_step)
 		var remainder = collision.get_remainder()
 		movement = direction * remainder.length()
 
