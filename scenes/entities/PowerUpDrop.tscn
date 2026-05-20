@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://dnr4rgo1k5ldq"]
+
+[ext_resource type="Script" uid="uid://bneuqjga41dri" path="res://scripts/entities/power_up_drop.gd" id="1_iyhl2"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_303l3"]
+size = Vector2(32, 32)
+
+[node name="PowerUpDrop" type="Area2D" unique_id=1516550322 groups=["powerups"]]
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("1_iyhl2")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1683482072]
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=150099998]
+shape = SubResource("RectangleShape2D_303l3")

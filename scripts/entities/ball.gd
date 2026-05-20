@@ -21,7 +21,6 @@ var current_speed: float:
 		current_speed = clampf(value, min_speed, max_speed)
 		var ratio = (current_speed - min_speed) / (max_speed - min_speed)
 		Events.speed_updated.emit(ratio)
-		print("[DEBUG] Ball Speed: ", current_speed)
 
 func _process(delta: float) -> void:
 	if not is_launched and is_instance_valid(attach_node):

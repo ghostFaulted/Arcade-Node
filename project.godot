@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Arcade-Node"
-config/version="0.2.2"
+config/version="0.3.0"
 run/main_scene="uid://c3m6txv1724ll"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 
 Events="*uid://c2ooev7j1gp2u"
 LevelManager="*uid://cm5c0x75b7ef0"
+PowerUpManager="*uid://if4jmy0b3m03"
 
 [display]
 
@@ -34,6 +35,11 @@ window/handheld/orientation=1
 [input_devices]
 
 pointing/emulate_touch_from_mouse=true
+
+[layer_names]
+
+2d_physics/layer_2="Paddle"
+2d_physics/layer_4="Power-up's"
 
 [physics]
 

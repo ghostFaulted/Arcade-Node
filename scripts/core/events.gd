@@ -12,3 +12,4 @@ signal paddle_exact_x_moved(target_x: float)
 signal ball_launched
 signal ball_spawned
 signal speed_updated(normalized_ratio: float)
+signal request_powerup_drop(spawn_position: Vector2)

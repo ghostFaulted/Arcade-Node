@@ -42,3 +42,7 @@ func _on_killzone_body_entered(body: Node2D) -> void:
 	if body.is_in_group("ball"):
 		body.queue_free()
 		Events.ball_lost.emit()
+		
+func _on_killzone_area_entered(area: Area2D) -> void:
+	if area.is_in_group("powerups"):
+		area.queue_free()
