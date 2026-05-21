@@ -31,7 +31,7 @@ func _physics_process(delta: float) -> void:
 	if not is_launched:
 		return  
 	var movement = direction * current_speed * delta
-	var has_damaged: bool = false
+	var damaged_objects: Array = []
 	for i in range(4):
 		var collision = move_and_collide(movement)
 		if not collision:
@@ -57,9 +57,9 @@ func _physics_process(delta: float) -> void:
 			direction.y = 0.2 * dir_sign
 			direction = direction.normalized()
 		if collider.has_method("take_damage"):
-			if not has_damaged:
+			if not collider in damaged_objects:
 				collider.take_damage(1)
-				has_damaged = true
+				damaged_objects.append(collider)
 				current_speed += speed_step
 		elif not collider.is_in_group("paddle") and normal.y > 0.8:
 			current_speed += (5.0 * speed_step)
@@ -71,6 +71,7 @@ func _ready() -> void:
 	Events.speed_updated.emit(0.0)
 	direction = direction.normalized()
 	Events.ball_launched.connect(_on_launch)
+	add_to_group("ball")
 	
 func _on_launch() -> void:
 	if not is_launched:

@@ -5,22 +5,41 @@ var current_play_area: Rect2
 func _ready() -> void:
 	Events.layout_calculated.connect(_on_layout_calculated)
 	
+	$Killzone.body_entered.connect(_on_killzone_body_entered)
+	$Killzone.area_entered.connect(_on_killzone_area_entered)
+	
+	$Killzone.monitoring = true
+	$Killzone.monitorable = false
+	$Killzone.collision_layer = 1
+	$Killzone.collision_mask = 1
+	
+	var col_shape = $Killzone/BottomZone
+	if col_shape == null:
+		print("[CRITICAL ERROR] Killzone has NO BottomZone node!")
+	elif col_shape.shape == null:
+		print("[CRITICAL ERROR] Killzone BottomZone has NO SHAPE assigned!")
+	else:
+		col_shape.disabled = false
+
 func _on_layout_calculated(play_area: Rect2, slider_y: float, paddle_y: float) -> void:
 	current_play_area = play_area
 	var thickness = 100.0
-	#TopWall
+	
 	$Walls/TopWall.shape.size = Vector2(play_area.size.x + thickness * 2.0, thickness)
 	$Walls/TopWall.global_position = Vector2(play_area.position.x + play_area.size.x / 2.0, play_area.position.y - (thickness / 2.0))
-	#LeftWall
+	
 	$Walls/LeftWall.shape.size = Vector2(thickness, play_area.size.y * 2.0)
 	$Walls/LeftWall.global_position = Vector2(play_area.position.x - thickness / 2.0, play_area.position.y + play_area.size.y / 2.0)
-	#RightWall
+	
 	$Walls/RightWall.shape.size = Vector2(thickness, play_area.size.y * 2.0)
 	$Walls/RightWall.global_position = Vector2(play_area.position.x + play_area.size.x + thickness / 2.0, play_area.position.y + play_area.size.y / 2.0)
-	#BottomZone 
-	var screen_height = get_viewport_rect().size.y
+	
 	$Killzone/BottomZone.shape.size = Vector2(play_area.size.x + thickness * 2.0, thickness)
-	$Killzone/BottomZone.global_position = Vector2(play_area.position.x + play_area.size.x / 2.0, screen_height + 150.0)
+	$Killzone/BottomZone.position = Vector2.ZERO 
+	
+	var screen_height = get_viewport_rect().size.y
+	$Killzone.global_position = Vector2(play_area.position.x + play_area.size.x / 2.0, screen_height + 150.0)
+	
 	queue_redraw()
 	
 func _draw() -> void:
@@ -45,4 +64,6 @@ func _on_killzone_body_entered(body: Node2D) -> void:
 		
 func _on_killzone_area_entered(area: Area2D) -> void:
 	if area.is_in_group("powerups"):
+		print("[DEBUG] Power-up fell into abyss and was destroyed: ", area.type)
+		Events.powerup_freed.emit() 
 		area.queue_free()
