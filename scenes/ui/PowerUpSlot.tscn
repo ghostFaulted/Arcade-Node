@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://c3jctdhdmul4e"]
+
+[ext_resource type="Script" uid="uid://bxdxev2gm6x6v" path="res://scripts/ui/power_up_slot.gd" id="1_5qhny"]
+
+[node name="PowerUpSlot" type="Control" unique_id=1206637269]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 60.0
+offset_bottom = 60.0
+script = ExtResource("1_5qhny")
+
+[node name="LetterLabel" type="Label" parent="." unique_id=1754196630]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 40
+text = "
+"
+horizontal_alignment = 1
+vertical_alignment = 1

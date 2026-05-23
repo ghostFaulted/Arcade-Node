@@ -5,19 +5,19 @@ var type: String = "none"
 
 func _ready() -> void:
 	add_to_group("powerups")
-	
 	monitorable = true
-	monitoring = false 
+	monitoring = true 
 	collision_layer = 1 
 	collision_mask = 1  
-	
+	body_entered.connect(_on_body_entered)
 	var col_shape = get_node_or_null("CollisionShape2D")
-	if col_shape == null:
-		print("[CRITICAL ERROR] PowerUpDrop has NO CollisionShape2D node as a child!")
-	elif col_shape.shape == null:
-		print("[CRITICAL ERROR] PowerUpDrop CollisionShape2D has NO SHAPE assigned in Inspector (it is empty)!")
-	else:
+	if col_shape != null and col_shape.shape != null:
 		col_shape.disabled = false
 
 func _process(delta: float) -> void:
 	global_position.y += fall_speed * delta
+	
+func _on_body_entered(body: Node2D) -> void:
+	if body.is_in_group("paddle"):
+		Events.powerup_collected.emit(type)
+		queue_free()

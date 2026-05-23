@@ -2,61 +2,72 @@ extends Node
 
 const PowerUpScene = preload("res://scenes/entities/PowerUpDrop.tscn")
 
-@export var base_chance: float = 0.04   
-@export var chance_step: float = 0.04   
-@export var max_on_screen: int = 3
-
+var base_chance: float = 0.04
 var current_chance: float = 0.04
-var active_powerups_count: int = 0
+var chance_step: float = 0.04
+var max_on_screen: int = 3
 
-@export var powerup_pool: Dictionary = {
+var powerup_pool = {
 	"slow_ball": 30,
-	"wide_paddle": 20,
 	"multiball": 10,
+	"wide_paddle": 20,
 	"extra_life": 5
 }
 
+var active_paddle_powerup: String = ""
+var active_ball_powerup: String = ""
+var paddle_timer: Timer
+var ball_timer: Timer
+const POWERUP_DURATION = 10.0
+var group_paddle = ["wide_paddle"]
+var group_ball = ["slow_ball"]
+var group_instant = ["multiball", "extra_life"]
+
 func _ready() -> void:
 	Events.request_powerup_drop.connect(_on_request_drop)
-	Events.powerup_freed.connect(_on_powerup_freed)
-	Events.level_ready.connect(_on_level_ready)
+	Events.powerup_collected.connect(_on_powerup_collected)
+	Events.ball_spawned.connect(reset_all_powerups)
+	Events.level_completed.connect(reset_all_powerups)
+	paddle_timer = Timer.new()
+	paddle_timer.one_shot = true
+	paddle_timer.timeout.connect(_on_paddle_timer_timeout)
+	add_child(paddle_timer)
+	
+	ball_timer = Timer.new()
+	ball_timer.one_shot = true
+	ball_timer.timeout.connect(_on_ball_timer_timeout)
+	add_child(ball_timer)
 
 func _on_request_drop(spawn_pos: Vector2) -> void:
-	if active_powerups_count >= max_on_screen:
-		print("[DEBUG] Power-up spawn frozen. Max on screen reached. Current chance: ", current_chance * 100.0, "%")
+	var current_powerups = get_tree().get_nodes_in_group("powerups").size()
+	if current_powerups >= max_on_screen:
+		#print("[DEBUG] Power-up spawn frozen. Max on screen reached. Current chance: ", current_chance * 100.0, "%")
 		return
 	var roll = randf()
-	print("[DEBUG] Roll: ", snapped(roll * 100.0, 0.1), "% | Chance to drop: ", current_chance * 100.0, "%")
+	#print("[DEBUG] Roll: ", snapped(roll * 100.0, 0.1), "% | Chance to drop: ", current_chance * 100.0, "%")
 	if roll <= current_chance:
 		current_chance = base_chance 
-		print("[DEBUG] SUCCESS! Power-up dropped. Chance reset to: ", current_chance * 100.0, "%")
+		#print("[DEBUG] SUCCESS! Power-up dropped. Chance reset to: ", current_chance * 100.0, "%")
 		_spawn_powerup(spawn_pos)
 	else:
 		current_chance += chance_step
-		print("[DEBUG] FAILURE. Chance increased to: ", current_chance * 100.0, "%")
+		#print("[DEBUG] FAILURE. Chance increased to: ", current_chance * 100.0, "%")
 
 func _spawn_powerup(pos: Vector2) -> void:
 	var chosen_type = _get_weighted_random()
 	var drop = PowerUpScene.instantiate()
 	drop.type = chosen_type
 	drop.global_position = pos
-	if chosen_type == "slow_ball": 
-		drop.modulate = Color.BLUE
-	elif chosen_type == "wide_paddle": 
-		drop.modulate = Color.GREEN
-	elif chosen_type == "multiball": 
-		drop.modulate = Color.WHITE
-	elif chosen_type == "extra_life": 
-		drop.modulate = Color.RED
+	if chosen_type == "slow_ball": drop.modulate = Color.BLUE
+	elif chosen_type == "multiball": drop.modulate = Color.WHITE
+	elif chosen_type == "wide_paddle": drop.modulate = Color.GREEN
+	elif chosen_type == "extra_life": drop.modulate = Color.RED
 	get_tree().current_scene.call_deferred("add_child", drop)
-	active_powerups_count += 1
 
 func _get_weighted_random() -> String:
 	var total_weight = 0
 	for key in powerup_pool:
 		total_weight += powerup_pool[key]
-	if total_weight <= 0:
-		return "slow_ball"
 	var random_val = randi() % total_weight
 	var current_weight = 0
 	for key in powerup_pool:
@@ -64,12 +75,58 @@ func _get_weighted_random() -> String:
 		if random_val < current_weight:
 			return key
 	return powerup_pool.keys()[0]
+
+func _on_powerup_collected(type: String) -> void:
+	print("[POWERUP] Collected: ", type)
+	if type in group_instant:
+		_apply_instant_powerup(type)
+	elif type in group_paddle:
+		_apply_paddle_powerup(type)
+	elif type in group_ball:
+		_apply_ball_powerup(type)
+
+func _apply_instant_powerup(type: String) -> void:
+	print("[POWERUP] Instant action applied: ", type)
+
+func _apply_paddle_powerup(type: String) -> void:
+	if active_paddle_powerup != "" and active_paddle_powerup != type:
+		_remove_paddle_powerup(active_paddle_powerup)
+		
+	active_paddle_powerup = type
+	paddle_timer.start(POWERUP_DURATION)
+	print("[POWERUP] Paddle Power-up ACTIVATED: ", type, " | Timer: ", POWERUP_DURATION, "s")
+
+func _apply_ball_powerup(type: String) -> void:
+	if active_ball_powerup != "" and active_ball_powerup != type:
+		_remove_ball_powerup(active_ball_powerup)
+		
+	active_ball_powerup = type
+	ball_timer.start(POWERUP_DURATION)
+	print("[POWERUP] Ball Power-up ACTIVATED: ", type, " | Timer: ", POWERUP_DURATION, "s")
+
+func _on_paddle_timer_timeout() -> void:
+	_remove_paddle_powerup(active_paddle_powerup)
+	active_paddle_powerup = ""
+
+func _on_ball_timer_timeout() -> void:
+	_remove_ball_powerup(active_ball_powerup)
+	active_ball_powerup = ""
+
+func _remove_paddle_powerup(type: String) -> void:
+	print("[POWERUP] Paddle Power-up DEACTIVATED: ", type)
+
+func _remove_ball_powerup(type: String) -> void:
+	print("[POWERUP] Ball Power-up DEACTIVATED: ", type)
+
+func reset_all_powerups() -> void:
+	if active_paddle_powerup != "":
+		_remove_paddle_powerup(active_paddle_powerup)
+		active_paddle_powerup = ""
+		paddle_timer.stop()
+		
+	if active_ball_powerup != "":
+		_remove_ball_powerup(active_ball_powerup)
+		active_ball_powerup = ""
+		ball_timer.stop()
 	
-func _on_powerup_freed() -> void:
-	active_powerups_count = max(0, active_powerups_count - 1) 
-	print("[DEBUG] Power-up freed. Active remaining: ", active_powerups_count)
-	
-func _on_level_ready(total_bricks: int) -> void:
-	active_powerups_count = 0
-	current_chance = base_chance
-	print("[DEBUG] PowerUpManager RESET. Active: ", active_powerups_count, " | Chance: ", current_chance * 100.0, "%")
+	print("[POWERUP] All power-ups have been RESET.")

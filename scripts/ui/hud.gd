@@ -43,6 +43,8 @@ func _on_layout_calculated(play_area: Rect2, slider_y: float, paddle_y: float) -
 	$CustomSlider.size.y = 130.0
 	$CustomSlider.position.y = slider_y
 	$CustomSlider.queue_redraw()
+	$PowerUpSlots.position.x = play_area.position.x + 10.0
+	$PowerUpSlots.position.y = slider_y + 140.0
 
 func _on_pause_button_pressed() -> void:
 	if is_game_over: return
