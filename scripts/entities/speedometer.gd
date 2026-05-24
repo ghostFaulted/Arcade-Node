@@ -19,6 +19,7 @@ const EMPTY_COLOR = Color(0.2, 0.2, 0.2, 0.8)
 func _ready() -> void:
 	paddle_width = get_parent().get_node("CollisionShape2D").shape.size.x
 	Events.speed_updated.connect(_on_speed_updated)
+	Events.paddle_size_changed.connect(_on_paddle_size_changed)
 	
 func _on_speed_updated(ratio: float) -> void:
 	current_ratio = ratio
@@ -36,3 +37,7 @@ func _draw() -> void:
 			draw_rect(rect, COLORS[i])
 		else:
 			draw_rect(rect, EMPTY_COLOR)
+			
+func _on_paddle_size_changed(new_width: float) -> void:
+	paddle_width = new_width
+	queue_redraw()

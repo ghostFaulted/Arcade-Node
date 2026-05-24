@@ -15,6 +15,7 @@ func _ready() -> void:
 	var target_x = clampf(center_x, margin, size.x - margin)
 	knob.position.x = target_x - (knob.size.x / 2.0)
 	Events.paddle_exact_x_moved.emit(global_position.x + target_x)
+	Events.paddle_size_changed.connect(_on_paddle_size_changed)
 
 func _gui_input(event: InputEvent) -> void:
 	if get_tree().paused:
@@ -41,3 +42,9 @@ func _draw() -> void:
 	var bottom_right = right_center + Vector2(0, track_radius)
 	draw_line(top_left, top_right, track_color, track_thickness, true)
 	draw_line(bottom_left, bottom_right, track_color, track_thickness, true)
+	
+func _on_paddle_size_changed(new_width: float) -> void:
+	paddle_half_width = new_width / 2.0
+	var target_x = clampf(knob.position.x + (knob.size.x / 2.0), paddle_half_width, size.x - paddle_half_width)
+	knob.position.x = target_x - (knob.size.x / 2.0)
+	Events.paddle_exact_x_moved.emit(target_x)

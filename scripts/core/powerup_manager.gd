@@ -2,15 +2,15 @@ extends Node
 
 const PowerUpScene = preload("res://scenes/entities/PowerUpDrop.tscn")
 
-var base_chance: float = 0.04
-var current_chance: float = 0.04
-var chance_step: float = 0.04
+var base_chance: float = 0.03
+var current_chance: float = 0.03
+var chance_step: float = 0.03
 var max_on_screen: int = 3
 
 var powerup_pool = {
 	"slow_ball": 30,
 	"multiball": 10,
-	"wide_paddle": 20,
+	"wide_paddle": 1000,
 	"extra_life": 5
 }
 
@@ -50,8 +50,16 @@ func _on_request_drop(spawn_pos: Vector2) -> void:
 		#print("[DEBUG] SUCCESS! Power-up dropped. Chance reset to: ", current_chance * 100.0, "%")
 		_spawn_powerup(spawn_pos)
 	else:
-		current_chance += chance_step
-		#print("[DEBUG] FAILURE. Chance increased to: ", current_chance * 100.0, "%")
+		var active_count: int = 0
+		if active_paddle_powerup != "": active_count += 1
+		if active_ball_powerup != "": active_count += 1
+		var dynamic_step = chance_step
+		if active_count == 1:
+			dynamic_step = chance_step / 2.0
+		elif active_count == 2:
+			dynamic_step = chance_step / 4.0
+		current_chance += dynamic_step
+		print("[DEBUG] FAILURE. Active buffs: ", active_count, " | Added step: ", dynamic_step * 100.0, "% | New chance: ", current_chance * 100.0, "%")
 
 func _spawn_powerup(pos: Vector2) -> void:
 	var chosen_type = _get_weighted_random()
@@ -87,6 +95,10 @@ func _on_powerup_collected(type: String) -> void:
 
 func _apply_instant_powerup(type: String) -> void:
 	print("[POWERUP] Instant action applied: ", type)
+	if type == "extra_life":
+		Events.life_gained.emit()
+	elif type == "multiball":
+		pass
 
 func _apply_paddle_powerup(type: String) -> void:
 	if active_paddle_powerup != "" and active_paddle_powerup != type:
@@ -95,6 +107,8 @@ func _apply_paddle_powerup(type: String) -> void:
 	active_paddle_powerup = type
 	paddle_timer.start(POWERUP_DURATION)
 	print("[POWERUP] Paddle Power-up ACTIVATED: ", type, " | Timer: ", POWERUP_DURATION, "s")
+	if type == "wide_paddle":
+		Events.paddle_size_changed.emit(150)
 
 func _apply_ball_powerup(type: String) -> void:
 	if active_ball_powerup != "" and active_ball_powerup != type:
@@ -114,6 +128,8 @@ func _on_ball_timer_timeout() -> void:
 
 func _remove_paddle_powerup(type: String) -> void:
 	print("[POWERUP] Paddle Power-up DEACTIVATED: ", type)
+	if type == "wide_paddle":
+		Events.paddle_size_changed.emit(110.0)
 
 func _remove_ball_powerup(type: String) -> void:
 	print("[POWERUP] Ball Power-up DEACTIVATED: ", type)

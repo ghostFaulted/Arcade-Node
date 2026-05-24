@@ -22,10 +22,11 @@ func _ready() -> void:
 	var side_margin = 10.0 
 	var play_x = side_margin
 	var play_width = screen_size.x - (side_margin * 2.0)
-	var play_y = top_ui_height
+	var play_y = top_ui_height + 30.0
 	var play_height = (screen_size.y - play_y) + 200.0 
 	var play_area = Rect2(play_x, play_y, play_width, play_height)
 	Events.layout_calculated.emit(play_area, slider_y, paddle_y)
+	Events.life_gained.connect(_on_life_gained)
 	spawn_ball()
 	
 func _on_brick_destroyed(points: int) -> void:
@@ -59,3 +60,8 @@ func spawn_ball() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch and event.is_pressed():
 		Events.ball_launched.emit()
+		
+func _on_life_gained() -> void:
+	lives += 1
+	Events.lives_updated.emit(lives)
+	print("[GAME] Extra life gained! Total lives: ", lives)

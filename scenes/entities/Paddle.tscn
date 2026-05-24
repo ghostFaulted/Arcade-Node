@@ -3,9 +3,6 @@
 [ext_resource type="Script" uid="uid://b6dd56umkq10t" path="res://scripts/entities/paddle.gd" id="1_jv2mh"]
 [ext_resource type="Script" uid="uid://6bgsfnc58uv2" path="res://scripts/entities/speedometer.gd" id="2_rxl3r"]
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_80l0o"]
-size = Vector2(110, 20)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jv2mh"]
 size = Vector2(110, 60)
 
@@ -13,12 +10,16 @@ size = Vector2(110, 60)
 sync_to_physics = false
 script = ExtResource("1_jv2mh")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1548647130]
-texture = SubResource("PlaceholderTexture2D_80l0o")
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1160385076]
 position = Vector2(0, 20)
 shape = SubResource("RectangleShape2D_jv2mh")
 
 [node name="Speedometer" type="Node2D" parent="." unique_id=1515675942]
 script = ExtResource("2_rxl3r")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=60605498]
+offset_left = -55.0
+offset_top = -10.0
+offset_right = 55.0
+offset_bottom = 10.0
+color = Color(1, 0, 1, 1)

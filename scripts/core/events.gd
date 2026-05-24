@@ -15,3 +15,5 @@ signal speed_updated(normalized_ratio: float)
 signal request_powerup_drop(spawn_position: Vector2)
 signal powerup_freed
 signal powerup_collected(type: String)
+signal life_gained
+signal paddle_size_changed(new_width: float)
