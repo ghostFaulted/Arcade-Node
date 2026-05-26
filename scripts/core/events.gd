@@ -17,3 +17,5 @@ signal powerup_freed
 signal powerup_collected(type: String)
 signal life_gained
 signal paddle_size_changed(new_width: float)
+signal ball_big_state_changed(is_active: bool)
+signal ball_slow_state_changed(active: bool)

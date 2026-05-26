@@ -18,7 +18,7 @@ func _ready() -> void:
 	var safe_margin_top = top_ratio * screen_size.y
 	var top_ui_height = safe_margin_top + 60.0
 	var slider_y = screen_size.y * 0.70
-	var paddle_y = slider_y - 80.0 
+	var paddle_y = slider_y - 120.0 
 	var side_margin = 10.0 
 	var play_x = side_margin
 	var play_width = screen_size.x - (side_margin * 2.0)
@@ -30,14 +30,16 @@ func _ready() -> void:
 	spawn_ball()
 	
 func _on_brick_destroyed(points: int) -> void:
+	if not is_inside_tree(): return
 	score += points
 	Events.score_updated.emit(score)
 	bricks_remaining -= 1
-	if bricks_remaining <= 0:
+	if bricks_remaining == 0:
 		Events.level_completed.emit()
 		get_tree().paused = true
 	
 func _on_ball_lost() -> void:
+	if not is_inside_tree(): return
 	lives -= 1
 	Events.lives_updated.emit(lives)
 	if lives > 0:

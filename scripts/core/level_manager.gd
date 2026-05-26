@@ -12,3 +12,6 @@ func get_current_level_data() -> Array:
 	if current_level_index >= 0 and current_level_index < levels.size():
 		return levels[current_level_index]
 	return levels[0]
+
+func has_next_level() -> bool:
+	return current_level_index < levels.size() - 1

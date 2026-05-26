@@ -7,6 +7,9 @@ extends CharacterBody2D
 const MAX_BOUNCE_ANGLE: float = PI / 3.0
 var is_launched: bool = false
 var attach_offset_y: float = 0.0
+var damage: int = 1
+var visual_scale: float = 1.0
+var is_slowed: bool = false
 var attach_node: Node2D:
 	set(value):
 		attach_node = value
@@ -18,6 +21,8 @@ var attach_node: Node2D:
 
 var current_speed: float:
 	set(value):
+		if is_slowed and value > current_speed:
+			return
 		current_speed = clampf(value, min_speed, max_speed)
 		var ratio = (current_speed - min_speed) / (max_speed - min_speed)
 		Events.speed_updated.emit(ratio)
@@ -58,7 +63,7 @@ func _physics_process(delta: float) -> void:
 			direction = direction.normalized()
 		if collider.has_method("take_damage"):
 			if not collider in damaged_objects:
-				collider.take_damage(1)
+				collider.take_damage(damage)
 				damaged_objects.append(collider)
 				current_speed += speed_step
 		elif not collider.is_in_group("paddle") and normal.y > 0.8:
@@ -71,6 +76,8 @@ func _ready() -> void:
 	Events.speed_updated.emit(0.0)
 	direction = direction.normalized()
 	Events.ball_launched.connect(_on_launch)
+	Events.ball_big_state_changed.connect(_on_ball_big_state_changed)
+	Events.ball_slow_state_changed.connect(_on_ball_slow_state_changed)
 	add_to_group("ball")
 	
 func _on_launch() -> void:
@@ -79,5 +86,21 @@ func _on_launch() -> void:
 		direction = Vector2.UP
 		
 func _draw() -> void:
-	var radius = $CollisionShape2D.shape.radius
+	var radius = $CollisionShape2D.shape.radius * visual_scale
 	draw_circle(Vector2.ZERO, radius, Color.YELLOW)
+	
+func _on_ball_big_state_changed(active: bool) -> void:
+	if active:
+		damage = 2
+		visual_scale = 1.5
+	else:
+		damage = 1
+		visual_scale = 1.0
+	$CollisionShape2D.scale = Vector2(visual_scale, visual_scale)
+	queue_redraw()
+	
+func _on_ball_slow_state_changed(active: bool) -> void:
+	is_slowed = active
+	if is_slowed:
+		current_speed = min_speed
+	

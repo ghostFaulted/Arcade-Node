@@ -21,15 +21,25 @@ func _on_lives_updated(new_lives: int) -> void:
 	
 func _on_game_over() -> void:
 	$Overlay/CenterContainer/VBoxContainer/MessageLabel.text = "GAME OVER"
+	$Overlay/CenterContainer/VBoxContainer/RestartButton.visible = true
+	$Overlay/CenterContainer/VBoxContainer/NextLevelButton.visible = false
 	$Overlay.visible = true
 	is_game_over = true
 	
 func _on_level_completed() -> void:
-	$Overlay/CenterContainer/VBoxContainer/MessageLabel.text = "YOU WIN!"
-	$Overlay.visible = true
 	is_game_over = true
+	$Overlay.visible = true
+	if LevelManager.has_next_level():
+		$Overlay/CenterContainer/VBoxContainer/MessageLabel.text = "LEVEL COMPLETED!"
+		$Overlay/CenterContainer/VBoxContainer/RestartButton.visible = false
+		$Overlay/CenterContainer/VBoxContainer/NextLevelButton.visible = true
+	else:
+		$Overlay/CenterContainer/VBoxContainer/MessageLabel.text = "GAME BEATEN!"
+		$Overlay/CenterContainer/VBoxContainer/RestartButton.visible = true
+		$Overlay/CenterContainer/VBoxContainer/NextLevelButton.visible = false
 
 func _on_restart_button_pressed() -> void:
+	if not is_inside_tree(): return
 	get_tree().paused = false
 	is_game_over = false
 	get_tree().reload_current_scene()
@@ -43,21 +53,28 @@ func _on_layout_calculated(play_area: Rect2, slider_y: float, paddle_y: float) -
 	$CustomSlider.size.y = 130.0
 	$CustomSlider.position.y = slider_y
 	$CustomSlider.queue_redraw()
-	$PowerUpSlots.position.x = play_area.position.x + 10.0
-	$PowerUpSlots.position.y = slider_y + 140.0
+	var slot_y = slider_y - 70.0
+	var center_x = play_area.position.x + (play_area.size.x / 2.0)
+	var slot_width = 60.0
+	var gap = 20.0
+	$PaddleSlot.position = Vector2(center_x - slot_width - (gap / 2.0), slot_y)
+	$BallSlot.position = Vector2(center_x + (gap / 2.0), slot_y)
 
 func _on_pause_button_pressed() -> void:
+	if not is_inside_tree() or is_game_over: return
 	if is_game_over: return
 	get_tree().paused = true
 	$PauseOverlay.visible = true
 	$MarginContainer/HBoxContainer/PauseButton.disabled = true
 
 func _on_resume_button_pressed() -> void:
+	if not is_inside_tree(): return
 	$PauseOverlay.visible = false
 	$MarginContainer/HBoxContainer/PauseButton.disabled = false
 	get_tree().paused = false
 
 func _on_menu_button_pressed() -> void:
+	if not is_inside_tree(): return
 	get_tree().paused = false
 	get_tree().change_scene_to_file("res://scenes/ui/LevelSelection.tscn")
 	
@@ -71,6 +88,7 @@ func apply_safe_area() -> void:
 	$MarginContainer.add_theme_constant_override("margin_top", 20 + safe_margin_top)
 
 func _on_pause_restart_button_pressed() -> void:
+	if not is_inside_tree(): return
 	get_tree().paused = false
 	is_game_over = false
 	get_tree().reload_current_scene()
@@ -87,3 +105,10 @@ func _on_ball_spawned() -> void:
 func _on_ball_launched() -> void:
 	is_waiting_for_launch = false
 	$CenterContainer/HintLabel.visible = false
+
+func _on_next_level_button_pressed() -> void:
+	if not is_inside_tree(): return
+	get_tree().paused = false
+	is_game_over = false
+	LevelManager.current_level_index += 1
+	get_tree().reload_current_scene()

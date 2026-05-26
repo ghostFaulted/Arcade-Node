@@ -16,11 +16,11 @@ func _process(delta: float) -> void:
 	if slot_type == "Paddle":
 		new_powerup = manager.active_paddle_powerup
 		if not manager.paddle_timer.is_stopped():
-			new_ratio = manager.paddle_timer.time_left / manager.POWERUP_DURATION
+			new_ratio = manager.paddle_timer.time_left / manager.current_paddle_duration
 	else:
 		new_powerup = manager.active_ball_powerup
 		if not manager.ball_timer.is_stopped():
-			new_ratio = manager.ball_timer.time_left / manager.POWERUP_DURATION
+			new_ratio = manager.ball_timer.time_left / manager.current_ball_duration
 	if new_ratio != current_ratio or new_powerup != active_powerup:
 		current_ratio = new_ratio
 		active_powerup = new_powerup

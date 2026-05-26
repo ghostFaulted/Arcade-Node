@@ -62,10 +62,15 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "Game Over!"
 
-[node name="Restart Button" type="Button" parent="Overlay/CenterContainer/VBoxContainer" unique_id=257511680]
+[node name="RestartButton" type="Button" parent="Overlay/CenterContainer/VBoxContainer" unique_id=257511680]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Restart"
+
+[node name="NextLevelButton" type="Button" parent="Overlay/CenterContainer/VBoxContainer" unique_id=801485013]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Next Level"
 
 [node name="PauseOverlay" type="ColorRect" parent="." unique_id=472838977]
 visible = false
@@ -137,20 +142,15 @@ theme_override_colors/font_color = Color(1, 1, 1, 0.5882353)
 theme_override_font_sizes/font_size = 48
 text = "Tap to launch the ball"
 
-[node name="PowerUpSlots" type="VBoxContainer" parent="." unique_id=1714812691]
-offset_right = 40.0
-offset_bottom = 40.0
-theme_override_constants/separation = 10
+[node name="PaddleSlot" parent="." unique_id=1206637269 instance=ExtResource("4_ig75s")]
 
-[node name="PaddleSlot" parent="PowerUpSlots" unique_id=1206637269 instance=ExtResource("4_ig75s")]
-layout_mode = 2
-
-[node name="BallSlot" parent="PowerUpSlots" unique_id=864914757 instance=ExtResource("4_ig75s")]
-layout_mode = 2
+[node name="BallSlot" parent="." unique_id=864914757 instance=ExtResource("4_ig75s")]
 slot_type = "Ball"
 
 [connection signal="pressed" from="MarginContainer/HBoxContainer/PauseButton" to="." method="_on_pause_button_pressed"]
-[connection signal="pressed" from="Overlay/CenterContainer/VBoxContainer/Restart Button" to="." method="_on_restart_button_pressed"]
+[connection signal="pressed" from="Overlay/CenterContainer/VBoxContainer/RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="pressed" from="Overlay/CenterContainer/VBoxContainer/NextLevelButton" to="." method="_on_next_level_button_pressed"]
+[connection signal="pressed" from="Overlay/CenterContainer/VBoxContainer/NextLevelButton" to="." method="_on_restart_button_pressed"]
 [connection signal="pressed" from="PauseOverlay/CenterContainer/VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]
 [connection signal="pressed" from="PauseOverlay/CenterContainer/VBoxContainer/PauseRestartButton" to="." method="_on_pause_restart_button_pressed"]
 [connection signal="pressed" from="PauseOverlay/CenterContainer/VBoxContainer/MenuButton" to="." method="_on_menu_button_pressed"]
