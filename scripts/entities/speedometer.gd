@@ -5,6 +5,7 @@ var paddle_width: float = 0.0
 @export var height: float = 8.0
 @export var y_offset: float = 14.0
 var current_ratio: float = 0.0
+var is_slowed: bool = false
 
 const COLORS =[
 	Color.GREEN,
@@ -20,6 +21,7 @@ func _ready() -> void:
 	paddle_width = get_parent().get_node("CollisionShape2D").shape.size.x
 	Events.speed_updated.connect(_on_speed_updated)
 	Events.paddle_size_changed.connect(_on_paddle_size_changed)
+	Events.ball_slow_state_changed.connect(_on_ball_slow_state_changed)
 	
 func _on_speed_updated(ratio: float) -> void:
 	current_ratio = ratio
@@ -32,12 +34,19 @@ func _draw() -> void:
 	for i in range(segments):
 		var pos_x = start_x + (i * (segment_width + gap))
 		var rect = Rect2(pos_x, y_offset, segment_width, height)
-		var threshold = i * 0.25
-		if current_ratio >= threshold:
-			draw_rect(rect, COLORS[i])
+		if is_slowed:
+			draw_rect(rect, COLORS[0])
 		else:
-			draw_rect(rect, EMPTY_COLOR)
-			
+			var threshold = i * 0.25
+			if current_ratio >= threshold:
+				draw_rect(rect, COLORS[i])
+			else:
+				draw_rect(rect, EMPTY_COLOR)
+				
 func _on_paddle_size_changed(new_width: float) -> void:
 	paddle_width = new_width
+	queue_redraw()
+	
+func _on_ball_slow_state_changed(active: bool) -> void:
+	is_slowed = active
 	queue_redraw()

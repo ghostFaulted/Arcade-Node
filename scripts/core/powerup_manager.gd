@@ -8,8 +8,8 @@ var chance_step: float = 0.03
 var max_on_screen: int = 3
 
 var powerup_pool = {
-	"slow_ball": 1000,
-	"big_ball": 1000,
+	"slow_ball": 25,
+	"big_ball": 25,
 	"multiball": 10,
 	"wide_paddle": 25,
 	"extra_life": 5
@@ -24,23 +24,27 @@ var current_ball_duration: float = 10.0
 var group_paddle = ["wide_paddle"]
 var group_ball = ["slow_ball", "big_ball"]
 var group_instant = ["multiball", "extra_life"]
+var is_level_active: bool = false
 
 func _ready() -> void:
 	Events.request_powerup_drop.connect(_on_request_drop)
 	Events.powerup_collected.connect(_on_powerup_collected)
 	Events.ball_spawned.connect(reset_all_powerups)
-	Events.level_completed.connect(reset_all_powerups)
+	Events.level_ready.connect(_on_level_ready)
+	Events.level_completed.connect(_on_level_ended)
+	Events.game_over.connect(_on_level_ended)
 	paddle_timer = Timer.new()
 	paddle_timer.one_shot = true
 	paddle_timer.timeout.connect(_on_paddle_timer_timeout)
 	add_child(paddle_timer)
-	
 	ball_timer = Timer.new()
 	ball_timer.one_shot = true
 	ball_timer.timeout.connect(_on_ball_timer_timeout)
 	add_child(ball_timer)
 
 func _on_request_drop(spawn_pos: Vector2) -> void:
+	if not is_level_active:
+		return
 	var current_powerups = get_tree().get_nodes_in_group("powerups").size()
 	if current_powerups >= max_on_screen:
 		#print("[DEBUG] Power-up spawn frozen. Max on screen reached. Current chance: ", current_chance * 100.0, "%")
@@ -111,7 +115,7 @@ func _apply_paddle_powerup(type: String) -> void:
 	paddle_timer.start(current_paddle_duration)
 	print("[POWERUP] Paddle Power-up ACTIVATED: ", type, " | Timer: ", current_paddle_duration, "s")
 	if type == "wide_paddle":
-		Events.paddle_size_changed.emit(150)
+		Events.paddle_size_changed.emit(170)
 
 func _apply_ball_powerup(type: String) -> void:
 	if active_ball_powerup != "" and active_ball_powerup != type:
@@ -136,7 +140,7 @@ func _on_ball_timer_timeout() -> void:
 func _remove_paddle_powerup(type: String) -> void:
 	print("[POWERUP] Paddle Power-up DEACTIVATED: ", type)
 	if type == "wide_paddle":
-		Events.paddle_size_changed.emit(110.0)
+		Events.paddle_size_changed.emit(130.0)
 
 func _remove_ball_powerup(type: String) -> void:
 	print("[POWERUP] Ball Power-up DEACTIVATED: ", type)
@@ -161,3 +165,10 @@ func reset_all_powerups() -> void:
 func _get_powerup_duration(type: String) -> float:
 	if type == "big_ball": return 15.0
 	return 10.0
+	
+func _on_level_ready(total_bricks: int) -> void:
+	is_level_active = true
+	
+func _on_level_ended() -> void:
+	is_level_active = false
+	reset_all_powerups()

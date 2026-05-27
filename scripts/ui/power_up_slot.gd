@@ -5,6 +5,8 @@ extends Control
 @export var ring_color: Color = Color.GREEN
 @export var bg_color: Color = Color(0.1, 0.1, 0.2, 0.8)
 @export var line_thickness: float = 6.0
+@export var outline_color: Color = Color.WHITE
+@export var outline_thickness: float = 2.0
 
 var current_ratio: float = 0.0
 var active_powerup: String = ""
@@ -42,3 +44,5 @@ func _draw() -> void:
 		var start_angle = -PI/2.0 + (TAU * (1.0 - current_ratio))
 		var end_angle = -PI/2.0 + TAU 
 		draw_arc(center, radius, start_angle, end_angle, 64, ring_color, line_thickness, true)
+	else:
+		draw_arc(center, radius, 0.0, TAU, 64, outline_color, outline_thickness, true)

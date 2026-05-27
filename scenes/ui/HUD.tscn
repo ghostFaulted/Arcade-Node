@@ -67,6 +67,11 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Restart"
 
+[node name="MenuButton" type="Button" parent="Overlay/CenterContainer/VBoxContainer" unique_id=1008071563]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Main Menu"
+
 [node name="NextLevelButton" type="Button" parent="Overlay/CenterContainer/VBoxContainer" unique_id=801485013]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
@@ -117,7 +122,7 @@ layout_mode = 3
 anchors_preset = 0
 offset_bottom = 100.0
 script = ExtResource("2_atyv1")
-paddle_half_width = 55.0
+paddle_half_width = 65.0
 
 [node name="Knob" type="Control" parent="CustomSlider" unique_id=1196959492]
 anchors_preset = 0
@@ -149,6 +154,7 @@ slot_type = "Ball"
 
 [connection signal="pressed" from="MarginContainer/HBoxContainer/PauseButton" to="." method="_on_pause_button_pressed"]
 [connection signal="pressed" from="Overlay/CenterContainer/VBoxContainer/RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="pressed" from="Overlay/CenterContainer/VBoxContainer/MenuButton" to="." method="_on_menu_button_pressed"]
 [connection signal="pressed" from="Overlay/CenterContainer/VBoxContainer/NextLevelButton" to="." method="_on_next_level_button_pressed"]
 [connection signal="pressed" from="Overlay/CenterContainer/VBoxContainer/NextLevelButton" to="." method="_on_restart_button_pressed"]
 [connection signal="pressed" from="PauseOverlay/CenterContainer/VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]

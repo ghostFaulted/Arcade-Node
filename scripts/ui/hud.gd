@@ -21,21 +21,22 @@ func _on_lives_updated(new_lives: int) -> void:
 	
 func _on_game_over() -> void:
 	$Overlay/CenterContainer/VBoxContainer/MessageLabel.text = "GAME OVER"
-	$Overlay/CenterContainer/VBoxContainer/RestartButton.visible = true
 	$Overlay/CenterContainer/VBoxContainer/NextLevelButton.visible = false
+	$Overlay/CenterContainer/VBoxContainer/RestartButton.visible = true
+	$Overlay/CenterContainer/VBoxContainer/MenuButton.visible = true
 	$Overlay.visible = true
 	is_game_over = true
 	
 func _on_level_completed() -> void:
 	is_game_over = true
 	$Overlay.visible = true
+	$Overlay/CenterContainer/VBoxContainer/RestartButton.visible = true
+	$Overlay/CenterContainer/VBoxContainer/MenuButton.visible = true
 	if LevelManager.has_next_level():
 		$Overlay/CenterContainer/VBoxContainer/MessageLabel.text = "LEVEL COMPLETED!"
-		$Overlay/CenterContainer/VBoxContainer/RestartButton.visible = false
 		$Overlay/CenterContainer/VBoxContainer/NextLevelButton.visible = true
 	else:
 		$Overlay/CenterContainer/VBoxContainer/MessageLabel.text = "GAME BEATEN!"
-		$Overlay/CenterContainer/VBoxContainer/RestartButton.visible = true
 		$Overlay/CenterContainer/VBoxContainer/NextLevelButton.visible = false
 
 func _on_restart_button_pressed() -> void:
