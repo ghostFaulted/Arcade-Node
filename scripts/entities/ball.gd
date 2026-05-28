@@ -83,7 +83,14 @@ func _ready() -> void:
 func _on_launch() -> void:
 	if not is_launched:
 		is_launched = true
-		direction = Vector2.UP
+		var max_angle_rad = deg_to_rad(37.5)
+		var min_angle_rad = deg_to_rad(10.0)
+		var random_angle = randf_range(-max_angle_rad, max_angle_rad)
+		if abs(random_angle) < min_angle_rad:
+			var dir_sign = sign(random_angle) if random_angle != 0 else 1.0
+			random_angle = min_angle_rad * dir_sign
+		direction = Vector2.UP.rotated(random_angle).normalized()
+		print("[LAUNCH] Random Angle: ", rad_to_deg(random_angle))
 		
 func _draw() -> void:
 	var radius = $CollisionShape2D.shape.radius * visual_scale
