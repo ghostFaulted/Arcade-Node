@@ -11,3 +11,8 @@ script = ExtResource("1_goa1b")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1297339078]
 shape = SubResource("CircleShape2D_goa1b")
+
+[node name="TrajectoryLine" type="Line2D" parent="." unique_id=251839776]
+width = 5.0
+default_color = Color(1, 1, 1, 0.39215687)
+joint_mode = 2
