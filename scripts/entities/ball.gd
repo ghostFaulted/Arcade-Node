@@ -67,10 +67,13 @@ func _physics_process(delta: float) -> void:
 				direction = Vector2.UP.rotated(bounce_angle).normalized()
 				current_speed += speed_step 
 			else:
-				direction = direction.bounce(normal).normalized()
-				direction.y = -abs(direction.y) - 0.5
-				direction = direction.normalized()
-				global_position.y -= 3.0
+				var paddle_shape = collider.get_node("CollisionShape2D").shape
+				var paddle_top_y = collider.global_position.y - (paddle_shape.size.y / 2.0)
+				var ball_radius = $CollisionShape2D.shape.radius * visual_scale
+				global_position.y = paddle_top_y - ball_radius - 1.0
+				var offset_dir = sign(global_position.x - collider.global_position.x)
+				if offset_dir == 0: offset_dir = 1.0
+				direction = Vector2(offset_dir * 0.5, -1.0).normalized() 
 		else:
 			direction = direction.bounce(normal).normalized()
 		if abs(direction.y) < 0.2:
