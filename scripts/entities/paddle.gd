@@ -17,7 +17,7 @@ func _ready() -> void:
 func _on_layout_calculated(play_area: Rect2, slider_y: float, paddle_y: float) -> void:
 	current_play_area = play_area
 	screen_width = play_area.size.x
-	half_width = $CollisionShape2D.shape.size.x / 2.0
+	half_width = $CollisionShape2D.shape.height / 2.0
 	min_x = play_area.position.x + half_width
 	max_x = play_area.position.x + play_area.size.x - half_width
 	target_x = play_area.position.x + play_area.size.x / 2.0
@@ -31,10 +31,10 @@ func _process(delta: float) -> void:
 		global_position = Vector2(target_x, target_y)
 		
 func _on_paddle_size_changed(new_width: float) -> void:
-	$CollisionShape2D.shape.size.x = new_width
+	$CollisionShape2D.shape.height = new_width
+	$Panel.size.x = new_width
+	$Panel.position.x = -(new_width / 2.0)
 	half_width = new_width / 2.0
 	min_x = current_play_area.position.x + half_width
 	max_x = current_play_area.position.x + current_play_area.size.x - half_width
-	$ColorRect.size.x = new_width
-	$ColorRect.position.x = -half_width
-	target_x = clampf(target_x, min_x, max_x)
+	queue_redraw()

@@ -18,7 +18,7 @@ const COLORS =[
 const EMPTY_COLOR = Color(0.2, 0.2, 0.2, 0.8)
 
 func _ready() -> void:
-	paddle_width = get_parent().get_node("CollisionShape2D").shape.size.x
+	paddle_width = get_parent().get_node("CollisionShape2D").shape.height
 	Events.speed_updated.connect(_on_speed_updated)
 	Events.paddle_size_changed.connect(_on_paddle_size_changed)
 	Events.ball_slow_state_changed.connect(_on_ball_slow_state_changed)

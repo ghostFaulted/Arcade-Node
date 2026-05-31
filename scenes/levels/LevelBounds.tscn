@@ -10,6 +10,8 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vaihy"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nhcll"]
+
 [node name="LevelBounds" type="Node2D" unique_id=981863865]
 script = ExtResource("1_nhcll")
 
@@ -28,6 +30,12 @@ shape = SubResource("RectangleShape2D_i5tpc")
 
 [node name="BottomZone" type="CollisionShape2D" parent="Killzone" unique_id=389711040]
 shape = SubResource("RectangleShape2D_vaihy")
+
+[node name="ShieldWall" type="StaticBody2D" parent="." unique_id=1363093440]
+
+[node name="Shape" type="CollisionShape2D" parent="ShieldWall" unique_id=262960375]
+shape = SubResource("RectangleShape2D_nhcll")
+disabled = true
 
 [connection signal="area_entered" from="Killzone" to="." method="_on_killzone_area_entered"]
 [connection signal="body_entered" from="Killzone" to="." method="_on_killzone_body_entered"]

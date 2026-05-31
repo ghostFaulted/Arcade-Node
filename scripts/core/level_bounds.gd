@@ -1,9 +1,12 @@
 extends Node2D
 
 var current_play_area: Rect2
+var is_shield_active: bool = false
+var current_paddle_y: float = 0.0
 
 func _ready() -> void:
 	Events.layout_calculated.connect(_on_layout_calculated)
+	Events.shield_state_changed.connect(_on_shield_state_changed)
 	
 	$Killzone.body_entered.connect(_on_killzone_body_entered)
 	$Killzone.area_entered.connect(_on_killzone_area_entered)
@@ -40,6 +43,10 @@ func _on_layout_calculated(play_area: Rect2, slider_y: float, paddle_y: float) -
 	var screen_height = get_viewport_rect().size.y
 	$Killzone.global_position = Vector2(play_area.position.x + play_area.size.x / 2.0, screen_height + 150.0)
 	
+	current_paddle_y = paddle_y
+	$ShieldWall/Shape.shape.size = Vector2(play_area.size.x, 20.0)
+	$ShieldWall/Shape.global_position = Vector2(play_area.position.x + play_area.size.x / 2.0, paddle_y + 30.0)
+	
 	queue_redraw()
 	
 func _draw() -> void:
@@ -56,6 +63,11 @@ func _draw() -> void:
 	draw_line(bottom_left, top_left, line_color, line_thickness)
 	draw_line(top_left, top_right, line_color, line_thickness)
 	draw_line(top_right, bottom_right, line_color, line_thickness)
+	if is_shield_active:
+		var shield_y = current_paddle_y + 30.0
+		var s_left = Vector2(current_play_area.position.x, shield_y)
+		var s_right = Vector2(current_play_area.end.x, shield_y)
+		draw_line(s_left, s_right, Color.CYAN, 6.0)
 
 func _on_killzone_body_entered(body: Node2D) -> void:
 	if body.is_in_group("ball"):
@@ -67,3 +79,8 @@ func _on_killzone_area_entered(area: Area2D) -> void:
 		print("[DEBUG] Power-up fell into abyss and was destroyed: ", area.type)
 		Events.powerup_freed.emit() 
 		area.queue_free()
+		
+func _on_shield_state_changed(active: bool) -> void:
+	is_shield_active = active
+	$ShieldWall/Shape.set_deferred("disabled", not active)
+	queue_redraw()

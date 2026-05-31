@@ -19,8 +19,8 @@ var attach_node: Node2D:
 		attach_node = value
 		if is_instance_valid(attach_node):
 			var paddle_col = attach_node.get_node("CollisionShape2D")
-			var paddle_thickness = paddle_col.shape.size.y 
-			var ball_radius = $CollisionShape2D.shape.radius
+			var paddle_thickness = paddle_col.shape.radius * 2.0
+			var ball_radius = $CollisionShape2D.shape.radius * visual_scale
 			attach_offset_y = (paddle_thickness / 2.0) + ball_radius
 
 var current_speed: float:
@@ -60,7 +60,7 @@ func _physics_process(delta: float) -> void:
 		var collider = collision.get_collider()
 		var normal = collision.get_normal()
 		if collider.is_in_group("paddle"):
-			if normal.y < -0.5 and direction.y > 0:
+			if normal.y < -0.2 and direction.y > 0:
 				var offset = global_position.x - collider.global_position.x
 				var normalized_offset = clampf(offset / collider.half_width, -1.0, 1.0)
 				var bounce_angle = normalized_offset * MAX_BOUNCE_ANGLE
@@ -68,7 +68,7 @@ func _physics_process(delta: float) -> void:
 				current_speed += speed_step 
 			else:
 				var paddle_shape = collider.get_node("CollisionShape2D").shape
-				var paddle_top_y = collider.global_position.y - (paddle_shape.size.y / 2.0)
+				var paddle_top_y = collider.global_position.y - paddle_shape.radius
 				var ball_radius = $CollisionShape2D.shape.radius * visual_scale
 				global_position.y = paddle_top_y - ball_radius - 1.0
 				var offset_dir = sign(global_position.x - collider.global_position.x)

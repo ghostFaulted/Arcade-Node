@@ -3,22 +3,30 @@
 [ext_resource type="Script" uid="uid://b6dd56umkq10t" path="res://scripts/entities/paddle.gd" id="1_jv2mh"]
 [ext_resource type="Script" uid="uid://6bgsfnc58uv2" path="res://scripts/entities/speedometer.gd" id="2_rxl3r"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_jv2mh"]
-size = Vector2(130, 20)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_rxl3r"]
+height = 130.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rxl3r"]
+bg_color = Color(1, 0, 1, 1)
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
 
 [node name="Paddle" type="AnimatableBody2D" unique_id=711358604]
 sync_to_physics = false
 script = ExtResource("1_jv2mh")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1160385076]
-shape = SubResource("RectangleShape2D_jv2mh")
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_rxl3r")
 
 [node name="Speedometer" type="Node2D" parent="." unique_id=1515675942]
 script = ExtResource("2_rxl3r")
 
-[node name="ColorRect" type="ColorRect" parent="." unique_id=60605498]
+[node name="Panel" type="Panel" parent="." unique_id=1246410827]
 offset_left = -65.0
 offset_top = -10.0
 offset_right = 65.0
 offset_bottom = 10.0
-color = Color(1, 0, 1, 1)
+theme_override_styles/panel = SubResource("StyleBoxFlat_rxl3r")

@@ -8,10 +8,11 @@ var chance_step: float = 0.03
 var max_on_screen: int = 3
 
 var powerup_pool = {
-	"slow_ball": 25,
-	"big_ball": 25,
+	"slow_ball": 30,
+	"big_ball": 30,
 	"multiball": 10,
-	"wide_paddle": 25,
+	"wide_paddle": 30,
+	"shield": 30,
 	"extra_life": 5
 }
 
@@ -21,7 +22,7 @@ var paddle_timer: Timer
 var ball_timer: Timer
 var current_paddle_duration: float = 10.0
 var current_ball_duration: float = 10.0
-var group_paddle = ["wide_paddle"]
+var group_paddle = ["wide_paddle", "shield"]
 var group_ball = ["slow_ball", "big_ball"]
 var group_instant = ["multiball", "extra_life"]
 var is_level_active: bool = false
@@ -77,6 +78,7 @@ func _spawn_powerup(pos: Vector2) -> void:
 	elif chosen_type == "wide_paddle": drop.modulate = Color.GREEN
 	elif chosen_type == "extra_life": drop.modulate = Color.RED
 	elif chosen_type == "big_ball": drop.modulate = Color.ORANGE
+	elif chosen_type == "shield": drop.modulate = Color.CYAN
 	get_tree().current_scene.call_deferred("add_child", drop)
 
 func _get_weighted_random() -> String:
@@ -116,6 +118,8 @@ func _apply_paddle_powerup(type: String) -> void:
 	print("[POWERUP] Paddle Power-up ACTIVATED: ", type, " | Timer: ", current_paddle_duration, "s")
 	if type == "wide_paddle":
 		Events.paddle_size_changed.emit(170)
+	elif type == "shield":
+		Events.shield_state_changed.emit(true)
 
 func _apply_ball_powerup(type: String) -> void:
 	if active_ball_powerup != "" and active_ball_powerup != type:
@@ -141,6 +145,8 @@ func _remove_paddle_powerup(type: String) -> void:
 	print("[POWERUP] Paddle Power-up DEACTIVATED: ", type)
 	if type == "wide_paddle":
 		Events.paddle_size_changed.emit(130.0)
+	elif type == "shield":
+		Events.shield_state_changed.emit(false)
 
 func _remove_ball_powerup(type: String) -> void:
 	print("[POWERUP] Ball Power-up DEACTIVATED: ", type)
