@@ -11,6 +11,7 @@ func _ready() -> void:
 	Events.layout_calculated.connect(_on_layout_calculated)
 	Events.ball_spawned.connect(_on_ball_spawned)
 	Events.ball_launched.connect(_on_ball_launched)
+	Events.ball_caught.connect(_on_ball_spawned)
 	apply_safe_area()
 
 func _on_score_updated(new_score: int) -> void:

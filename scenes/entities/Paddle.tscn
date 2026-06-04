@@ -7,7 +7,7 @@
 height = 130.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rxl3r"]
-bg_color = Color(1, 0, 1, 1)
+bg_color = Color(1, 0.078431375, 0.5764706, 1)
 corner_radius_top_left = 100
 corner_radius_top_right = 100
 corner_radius_bottom_right = 100
@@ -30,3 +30,5 @@ offset_top = -10.0
 offset_right = 65.0
 offset_bottom = 10.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_rxl3r")
+
+[node name="LaserTimer" type="Timer" parent="." unique_id=1307350314]

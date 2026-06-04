@@ -13,7 +13,9 @@ var powerup_pool = {
 	"multiball": 10,
 	"wide_paddle": 30,
 	"shield": 30,
-	"extra_life": 5
+	"laser": 30,
+	"extra_life": 5,
+	"magnet": 1000
 }
 
 var active_paddle_powerup: String = ""
@@ -22,7 +24,7 @@ var paddle_timer: Timer
 var ball_timer: Timer
 var current_paddle_duration: float = 10.0
 var current_ball_duration: float = 10.0
-var group_paddle = ["wide_paddle", "shield"]
+var group_paddle = ["wide_paddle", "shield", "laser", "magnet"]
 var group_ball = ["slow_ball", "big_ball"]
 var group_instant = ["multiball", "extra_life"]
 var is_level_active: bool = false
@@ -79,6 +81,8 @@ func _spawn_powerup(pos: Vector2) -> void:
 	elif chosen_type == "extra_life": drop.modulate = Color.RED
 	elif chosen_type == "big_ball": drop.modulate = Color.ORANGE
 	elif chosen_type == "shield": drop.modulate = Color.CYAN
+	elif chosen_type == "laser": drop.modulate = Color.YELLOW
+	elif chosen_type == "magnet": drop.modulate = Color.PURPLE
 	get_tree().current_scene.call_deferred("add_child", drop)
 
 func _get_weighted_random() -> String:
@@ -120,6 +124,10 @@ func _apply_paddle_powerup(type: String) -> void:
 		Events.paddle_size_changed.emit(170)
 	elif type == "shield":
 		Events.shield_state_changed.emit(true)
+	elif type == "laser":
+		Events.paddle_laser_state_changed.emit(true)
+	elif type == "magnet":
+		Events.paddle_magnet_state_changed.emit(true)
 
 func _apply_ball_powerup(type: String) -> void:
 	if active_ball_powerup != "" and active_ball_powerup != type:
@@ -147,6 +155,10 @@ func _remove_paddle_powerup(type: String) -> void:
 		Events.paddle_size_changed.emit(130.0)
 	elif type == "shield":
 		Events.shield_state_changed.emit(false)
+	elif type == "laser":
+		Events.paddle_laser_state_changed.emit(false)
+	elif type == "magnet":
+		Events.paddle_magnet_state_changed.emit(false)
 
 func _remove_ball_powerup(type: String) -> void:
 	print("[POWERUP] Ball Power-up DEACTIVATED: ", type)
@@ -170,6 +182,7 @@ func reset_all_powerups() -> void:
 	
 func _get_powerup_duration(type: String) -> float:
 	if type == "big_ball": return 15.0
+	if type == "magnet": return 15.0
 	return 10.0
 	
 func _on_level_ready(total_bricks: int) -> void:

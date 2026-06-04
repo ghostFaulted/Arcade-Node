@@ -20,3 +20,6 @@ signal paddle_size_changed(new_width: float)
 signal ball_big_state_changed(is_active: bool)
 signal ball_slow_state_changed(active: bool)
 signal shield_state_changed(is_active: bool)
+signal paddle_laser_state_changed(is_active: bool)
+signal paddle_magnet_state_changed(is_active: bool)
+signal ball_caught

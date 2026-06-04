@@ -13,6 +13,7 @@ var visual_scale: float = 1.0
 var is_slowed: bool = false 
 var launch_direction: Vector2 = Vector2.UP
 @onready var trajectory_line = $TrajectoryLine
+var attach_offset_x: float = 0.0
 
 var attach_node: Node2D:
 	set(value):
@@ -45,7 +46,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if not is_launched and is_instance_valid(attach_node):
 		var col_pos = attach_node.get_node("CollisionShape2D").global_position
-		global_position = col_pos - Vector2(0, attach_offset_y)
+		global_position = col_pos + Vector2(attach_offset_x, -attach_offset_y)
 
 func _physics_process(delta: float) -> void:
 	if not is_launched:
@@ -60,6 +61,16 @@ func _physics_process(delta: float) -> void:
 		var collider = collision.get_collider()
 		var normal = collision.get_normal()
 		if collider.is_in_group("paddle"):
+			if collider.get("is_magnet_active") == true and collider.get("attached_ball") == null:
+				attach_offset_x = global_position.x - collider.global_position.x
+				var ball_rad = $CollisionShape2D.shape.radius * visual_scale
+				attach_offset_x = clampf(attach_offset_x, -collider.half_width + ball_rad, collider.half_width - ball_rad)
+				is_launched = false
+				attach_node = collider
+				collider.attached_ball = self
+				trajectory_line.visible = true
+				Events.ball_caught.emit()
+				continue
 			if normal.y < -0.2 and direction.y > 0:
 				var offset = global_position.x - collider.global_position.x
 				var normalized_offset = clampf(offset / collider.half_width, -1.0, 1.0)
@@ -140,6 +151,9 @@ func _on_launch() -> void:
 		is_launched = true
 		direction = launch_direction
 		trajectory_line.visible = false
+		if is_instance_valid(attach_node) and attach_node.is_in_group("paddle"):
+			if attach_node.get("attached_ball") == self:
+				attach_node.attached_ball = null
 		
 func _draw() -> void:
 	var radius = $CollisionShape2D.shape.radius * visual_scale

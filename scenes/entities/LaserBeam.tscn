@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://dcwn0d44j7axy"]
+
+[ext_resource type="Script" uid="uid://bq0182b1qx0m4" path="res://scripts/entities/laser_beam.gd" id="1_i6rh7"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jmtmi"]
+size = Vector2(4, 20)
+
+[node name="LaserBeam" type="Area2D" unique_id=840696566]
+collision_layer = 0
+monitorable = false
+script = ExtResource("1_i6rh7")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=2106098922]
+offset_left = -2.0
+offset_top = -10.0
+offset_right = 2.0
+offset_bottom = 10.0
+color = Color(1, 0.98333335, 0, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=963768459]
+shape = SubResource("RectangleShape2D_jmtmi")
