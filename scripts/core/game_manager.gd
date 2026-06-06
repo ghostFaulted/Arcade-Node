@@ -13,6 +13,10 @@ func _ready() -> void:
 	Events.lives_updated.emit.call_deferred(3)
 	await get_tree().process_frame
 	var screen_size = get_viewport().get_visible_rect().size
+	var current_aspect = screen_size.y / screen_size.x
+	var base_aspect = 20.0 / 9.0
+	Events.vertical_speed_scale = current_aspect / base_aspect
+	print("[DIAGNOSTIC] Aspect Ratio: ", current_aspect, " | Speed Multiplier: ", Events.vertical_speed_scale)
 	var safe_area = DisplayServer.get_display_safe_area()
 	var top_ratio = float(safe_area.position.y) / float(DisplayServer.screen_get_size().y) if DisplayServer.screen_get_size().y > 0 else 0.0
 	var safe_margin_top = top_ratio * screen_size.y

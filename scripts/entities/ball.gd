@@ -1,8 +1,8 @@
 extends CharacterBody2D
 
-@export var min_speed: float = 700.0
-@export var max_speed: float = 1100.0
-@export var speed_step: float = 7.5
+@export var min_speed: float = 850.0
+@export var max_speed: float = 1300.0
+@export var speed_step: float = 10.0
 @export var direction: Vector2 = Vector2.ZERO
 const MAX_BOUNCE_ANGLE: float = PI / 3.0
 const MAX_LAUNCH_ANGLE: float = deg_to_rad(60.0)
@@ -34,6 +34,9 @@ var current_speed: float:
 		Events.speed_updated.emit(ratio)
 
 func _ready() -> void:
+	min_speed *= Events.vertical_speed_scale
+	max_speed *= Events.vertical_speed_scale
+	speed_step *= Events.vertical_speed_scale
 	current_speed = min_speed
 	Events.speed_updated.emit(0.0)
 	direction = direction.normalized()

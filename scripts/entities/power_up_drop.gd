@@ -4,6 +4,7 @@ extends Area2D
 var type: String = "none"
 
 func _ready() -> void:
+	fall_speed *= Events.vertical_speed_scale
 	add_to_group("powerups")
 	monitorable = true
 	monitoring = true 

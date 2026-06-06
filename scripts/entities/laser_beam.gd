@@ -2,6 +2,9 @@ extends Area2D
 
 var speed: float = 1000.0
 
+func _ready() -> void:
+	speed *= Events.vertical_speed_scale
+
 func _physics_process(delta: float) -> void:
 	var step = Vector2.UP * speed * delta
 	var target_pos = global_position + step
