@@ -15,7 +15,7 @@ var powerup_pool = {
 	"shield": 30,
 	"laser": 30,
 	"extra_life": 5,
-	"magnet": 1000
+	"magnet": 30
 }
 
 var active_paddle_powerup: String = ""
@@ -182,7 +182,6 @@ func reset_all_powerups() -> void:
 	
 func _get_powerup_duration(type: String) -> float:
 	if type == "big_ball": return 15.0
-	if type == "magnet": return 15.0
 	return 10.0
 	
 func _on_level_ready(total_bricks: int) -> void:

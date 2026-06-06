@@ -2,6 +2,7 @@ extends CanvasLayer
 
 var is_game_over: bool = false
 var is_waiting_for_launch: bool = false
+var hint_timer: Timer
 
 func _ready() -> void:
 	Events.score_updated.connect(_on_score_updated)
@@ -13,6 +14,11 @@ func _ready() -> void:
 	Events.ball_launched.connect(_on_ball_launched)
 	Events.ball_caught.connect(_on_ball_spawned)
 	apply_safe_area()
+	hint_timer = Timer.new()
+	hint_timer.one_shot = true
+	hint_timer.process_mode = Node.PROCESS_MODE_PAUSABLE
+	hint_timer.timeout.connect(_on_hint_timer_timeout)
+	add_child(hint_timer)
 
 func _on_score_updated(new_score: int) -> void:
 	$MarginContainer/HBoxContainer/ScoreLabel.text = "Score: " + str(new_score)
@@ -64,7 +70,6 @@ func _on_layout_calculated(play_area: Rect2, slider_y: float, paddle_y: float) -
 
 func _on_pause_button_pressed() -> void:
 	if not is_inside_tree() or is_game_over: return
-	if is_game_over: return
 	get_tree().paused = true
 	$PauseOverlay.visible = true
 	$MarginContainer/HBoxContainer/PauseButton.disabled = true
@@ -96,17 +101,19 @@ func _on_pause_restart_button_pressed() -> void:
 	get_tree().reload_current_scene()
 	
 func _on_ball_spawned() -> void:
+	if not is_inside_tree(): return
 	is_waiting_for_launch = true
-	$CenterContainer/HintLabel.visible = false
-	await get_tree().create_timer(4.0, false).timeout
-	if not is_inside_tree():
-		return
-	if is_waiting_for_launch and not is_game_over:
-		$CenterContainer/HintLabel.visible = true
-		
+	$CenterContainer/HBoxContainer.visible = true
+	$CenterContainer/HBoxContainer/LaunchButtonGraphic.visible = true
+	$CenterContainer/HBoxContainer/TextLeft.modulate.a = 0.0
+	$CenterContainer/HBoxContainer/TextRight.modulate.a = 0.0
+	hint_timer.start(4.0)
+	
 func _on_ball_launched() -> void:
+	if not is_inside_tree(): return
 	is_waiting_for_launch = false
-	$CenterContainer/HintLabel.visible = false
+	$CenterContainer/HBoxContainer.visible = false
+	hint_timer.stop()
 
 func _on_next_level_button_pressed() -> void:
 	if not is_inside_tree(): return
@@ -114,3 +121,8 @@ func _on_next_level_button_pressed() -> void:
 	is_game_over = false
 	LevelManager.current_level_index += 1
 	get_tree().reload_current_scene()
+	
+func _on_hint_timer_timeout() -> void:
+	if is_waiting_for_launch and not is_game_over:
+		$CenterContainer/HBoxContainer/TextLeft.modulate.a = 1.0
+		$CenterContainer/HBoxContainer/TextRight.modulate.a = 1.0
