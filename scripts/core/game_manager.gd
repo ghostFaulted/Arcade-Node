@@ -31,6 +31,7 @@ func _ready() -> void:
 	var play_area = Rect2(play_x, play_y, play_width, play_height)
 	Events.layout_calculated.emit(play_area, slider_y, paddle_y)
 	Events.life_gained.connect(_on_life_gained)
+	Events.multiball_activated.connect(_on_multiball_activated)
 	spawn_ball()
 	
 func _on_brick_destroyed(points: int) -> void:
@@ -44,13 +45,20 @@ func _on_brick_destroyed(points: int) -> void:
 	
 func _on_ball_lost() -> void:
 	if not is_inside_tree(): return
-	lives -= 1
-	Events.lives_updated.emit(lives)
-	if lives > 0:
-		spawn_ball()
-	else:
-		Events.game_over.emit()
-		get_tree().paused = true
+	
+	var active_balls = 0
+	for b in get_tree().get_nodes_in_group("ball"):
+		if not b.is_queued_for_deletion():
+			active_balls += 1
+			
+	if active_balls == 0:
+		lives -= 1
+		Events.lives_updated.emit(lives)
+		if lives > 0:
+			spawn_ball()
+		else:
+			Events.game_over.emit()
+			get_tree().paused = true
 		
 func _on_level_ready(total: int) -> void:
 	bricks_remaining = total
@@ -71,3 +79,17 @@ func _on_life_gained() -> void:
 	lives += 1
 	Events.lives_updated.emit(lives)
 	print("[GAME] Extra life gained! Total lives: ", lives)
+
+func _on_multiball_activated() -> void:
+	if not is_inside_tree(): return
+	var paddle = get_tree().get_first_node_in_group("paddle")
+	if not is_instance_valid(paddle): return
+	
+	var directions = [Vector2(-1, -1).normalized(), Vector2(1, -1).normalized()]
+	
+	for dir in directions:
+		var ball = BallScene.instantiate()
+		ball.global_position = paddle.global_position - Vector2(0, 40)
+		ball.direction = dir
+		ball.is_launched = true
+		get_parent().call_deferred("add_child", ball)

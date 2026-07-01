@@ -8,9 +8,9 @@ var chance_step: float = 0.03
 var max_on_screen: int = 3
 
 var powerup_pool = {
-	"slow_ball": 30,
-	"big_ball": 30,
-	"multiball": 10,
+	"slow_ball": 1000,
+	"big_ball": 1000,
+	"multiball": 1000,
 	"wide_paddle": 30,
 	"shield": 30,
 	"laser": 30,
@@ -50,13 +50,10 @@ func _on_request_drop(spawn_pos: Vector2) -> void:
 		return
 	var current_powerups = get_tree().get_nodes_in_group("powerups").size()
 	if current_powerups >= max_on_screen:
-		#print("[DEBUG] Power-up spawn frozen. Max on screen reached. Current chance: ", current_chance * 100.0, "%")
 		return
 	var roll = randf()
-	#print("[DEBUG] Roll: ", snapped(roll * 100.0, 0.1), "% | Chance to drop: ", current_chance * 100.0, "%")
 	if roll <= current_chance:
 		current_chance = base_chance 
-		#print("[DEBUG] SUCCESS! Power-up dropped. Chance reset to: ", current_chance * 100.0, "%")
 		_spawn_powerup(spawn_pos)
 	else:
 		var active_count: int = 0
@@ -68,7 +65,6 @@ func _on_request_drop(spawn_pos: Vector2) -> void:
 		elif active_count == 2:
 			dynamic_step = chance_step / 4.0
 		current_chance += dynamic_step
-		print("[DEBUG] FAILURE. Active buffs: ", active_count, " | Added step: ", dynamic_step * 100.0, "% | New chance: ", current_chance * 100.0, "%")
 
 func _spawn_powerup(pos: Vector2) -> void:
 	var chosen_type = _get_weighted_random()
@@ -111,7 +107,7 @@ func _apply_instant_powerup(type: String) -> void:
 	if type == "extra_life":
 		Events.life_gained.emit()
 	elif type == "multiball":
-		pass
+		Events.multiball_activated.emit()
 
 func _apply_paddle_powerup(type: String) -> void:
 	if active_paddle_powerup != "" and active_paddle_powerup != type:

@@ -17,6 +17,7 @@ corner_radius_bottom_left = 100
 [node name="Hud" type="CanvasLayer" unique_id=2132756405]
 process_mode = 3
 script = ExtResource("1_kw0id")
+prompt_y_offset = 75.0
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1725705008]
 anchors_preset = 10

@@ -3,9 +3,11 @@ extends CharacterBody2D
 @export var min_speed: float = 850.0
 @export var max_speed: float = 1300.0
 @export var speed_step: float = 10.0
+@export var slow_speed: float = 600.0
 @export var direction: Vector2 = Vector2.ZERO
 const MAX_BOUNCE_ANGLE: float = PI / 3.0
 const MAX_LAUNCH_ANGLE: float = deg_to_rad(60.0)
+
 var is_launched: bool = false
 var attach_offset_y: float = 0.0
 var damage: int = 1
@@ -37,14 +39,42 @@ func _ready() -> void:
 	min_speed *= Events.vertical_speed_scale
 	max_speed *= Events.vertical_speed_scale
 	speed_step *= Events.vertical_speed_scale
-	current_speed = min_speed
-	Events.speed_updated.emit(0.0)
+	slow_speed *= Events.vertical_speed_scale
+	
+	var inherited_speed = min_speed
+	var existing_balls = get_tree().get_nodes_in_group("ball")
+	for b in existing_balls:
+		if b != self and is_instance_valid(b) and not b.is_queued_for_deletion():
+			inherited_speed = b.current_speed
+			break
+			
+	current_speed = inherited_speed
+	
+	if existing_balls.size() <= 1:
+		Events.speed_updated.emit((current_speed - min_speed) / (max_speed - min_speed))
+		
 	direction = direction.normalized()
+	
 	Events.ball_launched.connect(_on_launch)
 	Events.ball_big_state_changed.connect(_on_ball_big_state_changed)
 	Events.ball_slow_state_changed.connect(_on_ball_slow_state_changed)
-	trajectory_line.visible = true 
+	
+	for other_ball in get_tree().get_nodes_in_group("ball"):
+		if other_ball != self:
+			add_collision_exception_with(other_ball)
+			other_ball.add_collision_exception_with(self)
+			
 	add_to_group("ball")
+	
+	if is_launched:
+		trajectory_line.visible = false
+	else:
+		trajectory_line.visible = true
+		
+	if PowerUpManager.active_ball_powerup == "slow_ball":
+		_on_ball_slow_state_changed(true)
+	elif PowerUpManager.active_ball_powerup == "big_ball":
+		_on_ball_big_state_changed(true)
 
 func _process(delta: float) -> void:
 	if not is_launched and is_instance_valid(attach_node):
@@ -79,7 +109,7 @@ func _physics_process(delta: float) -> void:
 				var normalized_offset = clampf(offset / collider.half_width, -1.0, 1.0)
 				var bounce_angle = normalized_offset * MAX_BOUNCE_ANGLE
 				direction = Vector2.UP.rotated(bounce_angle).normalized()
-				current_speed += speed_step 
+				_increase_global_speed(speed_step) # ФІКС
 			else:
 				var paddle_shape = collider.get_node("CollisionShape2D").shape
 				var paddle_top_y = collider.global_position.y - paddle_shape.radius
@@ -98,11 +128,31 @@ func _physics_process(delta: float) -> void:
 			if not collider in damaged_objects:
 				collider.take_damage(damage)
 				damaged_objects.append(collider)
-				current_speed += speed_step
+				_increase_global_speed(speed_step) # ФІКС
 		elif not collider.is_in_group("paddle") and normal.y > 0.8:
-			current_speed += (5.0 * speed_step)
+			_increase_global_speed(5.0 * speed_step) # ФІКС
 		var remainder = collision.get_remainder()
 		movement = direction * remainder.length()
+
+func _increase_global_speed(amount: float) -> void:
+	if is_slowed: return
+	
+	var balls = get_tree().get_nodes_in_group("ball")
+	var valid_balls = 0
+	
+	for b in balls:
+		if not b.is_queued_for_deletion():
+			valid_balls += 1
+			
+	if valid_balls == 0: valid_balls = 1
+	
+	var actual_step = amount / float(valid_balls)
+	var new_speed = clampf(current_speed + actual_step, min_speed, max_speed)
+	
+	for b in balls:
+		if not b.is_queued_for_deletion():
+			if b.current_speed != new_speed:
+				b.current_speed = new_speed
 
 func _update_trajectory() -> void:
 	if not is_instance_valid(attach_node): return 
@@ -175,5 +225,6 @@ func _on_ball_big_state_changed(active: bool) -> void:
 func _on_ball_slow_state_changed(active: bool) -> void:
 	is_slowed = active
 	if is_slowed:
+		current_speed = slow_speed
+	else:
 		current_speed = min_speed
-		

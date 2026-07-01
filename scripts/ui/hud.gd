@@ -1,5 +1,6 @@
 extends CanvasLayer
 
+@export var prompt_y_offset: float = 150.0
 var is_game_over: bool = false
 var is_waiting_for_launch: bool = false
 var hint_timer: Timer
@@ -32,11 +33,13 @@ func _on_game_over() -> void:
 	$Overlay/CenterContainer/VBoxContainer/RestartButton.visible = true
 	$Overlay/CenterContainer/VBoxContainer/MenuButton.visible = true
 	$Overlay.visible = true
+	$CenterContainer.visible = false 
 	is_game_over = true
 	
 func _on_level_completed() -> void:
 	is_game_over = true
 	$Overlay.visible = true
+	$CenterContainer.visible = false 
 	$Overlay/CenterContainer/VBoxContainer/RestartButton.visible = true
 	$Overlay/CenterContainer/VBoxContainer/MenuButton.visible = true
 	if LevelManager.has_next_level():
@@ -67,18 +70,21 @@ func _on_layout_calculated(play_area: Rect2, slider_y: float, paddle_y: float) -
 	var gap = 20.0
 	$PaddleSlot.position = Vector2(center_x - slot_width - (gap / 2.0), slot_y)
 	$BallSlot.position = Vector2(center_x + (gap / 2.0), slot_y)
+	$CenterContainer.position.y = prompt_y_offset
 
 func _on_pause_button_pressed() -> void:
 	if not is_inside_tree() or is_game_over: return
 	get_tree().paused = true
 	$PauseOverlay.visible = true
 	$MarginContainer/HBoxContainer/PauseButton.disabled = true
+	$CenterContainer.visible = false 
 
 func _on_resume_button_pressed() -> void:
 	if not is_inside_tree(): return
 	$PauseOverlay.visible = false
 	$MarginContainer/HBoxContainer/PauseButton.disabled = false
 	get_tree().paused = false
+	$CenterContainer.visible = true
 
 func _on_menu_button_pressed() -> void:
 	if not is_inside_tree(): return
