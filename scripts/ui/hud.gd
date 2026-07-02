@@ -3,6 +3,7 @@ extends CanvasLayer
 @export var prompt_y_offset: float = 150.0
 var is_game_over: bool = false
 var is_waiting_for_launch: bool = false
+var has_aimed: bool = false 
 var hint_timer: Timer
 
 func _ready() -> void:
@@ -14,7 +15,9 @@ func _ready() -> void:
 	Events.ball_spawned.connect(_on_ball_spawned)
 	Events.ball_launched.connect(_on_ball_launched)
 	Events.ball_caught.connect(_on_ball_spawned)
+	Events.ball_aimed.connect(_on_ball_aimed)
 	apply_safe_area()
+	
 	hint_timer = Timer.new()
 	hint_timer.one_shot = true
 	hint_timer.process_mode = Node.PROCESS_MODE_PAUSABLE
@@ -57,6 +60,10 @@ func _on_restart_button_pressed() -> void:
 
 func _on_paddle_controller_value_changed(value: float) -> void:
 	Events.paddle_slider_moved.emit(value)
+	
+	if is_waiting_for_launch and has_aimed:
+		$CenterContainer/PromptLabel.modulate.a = 0.0
+		hint_timer.start(4.0)
 	
 func _on_layout_calculated(play_area: Rect2, slider_y: float, paddle_y: float) -> void:
 	$CustomSlider.size.x = play_area.size.x
@@ -109,16 +116,18 @@ func _on_pause_restart_button_pressed() -> void:
 func _on_ball_spawned() -> void:
 	if not is_inside_tree(): return
 	is_waiting_for_launch = true
-	$CenterContainer/HBoxContainer.visible = true
-	$CenterContainer/HBoxContainer/LaunchButtonGraphic.visible = true
-	$CenterContainer/HBoxContainer/TextLeft.modulate.a = 0.0
-	$CenterContainer/HBoxContainer/TextRight.modulate.a = 0.0
+	has_aimed = false
+	$CenterContainer/PromptLabel.visible = true
+	
+	$CenterContainer/PromptLabel.text = "Move slider to aim"
+	$CenterContainer/PromptLabel.modulate.a = 0.0
+	
 	hint_timer.start(4.0)
 	
 func _on_ball_launched() -> void:
 	if not is_inside_tree(): return
 	is_waiting_for_launch = false
-	$CenterContainer/HBoxContainer.visible = false
+	$CenterContainer/PromptLabel.visible = false
 	hint_timer.stop()
 
 func _on_next_level_button_pressed() -> void:
@@ -130,5 +139,15 @@ func _on_next_level_button_pressed() -> void:
 	
 func _on_hint_timer_timeout() -> void:
 	if is_waiting_for_launch and not is_game_over:
-		$CenterContainer/HBoxContainer/TextLeft.modulate.a = 1.0
-		$CenterContainer/HBoxContainer/TextRight.modulate.a = 1.0
+		$CenterContainer/PromptLabel.modulate.a = 1.0
+
+func _on_ball_aimed() -> void:
+	if not is_inside_tree() or not is_waiting_for_launch: return
+
+	has_aimed = true
+	
+	$CenterContainer/PromptLabel.modulate.a = 0.0
+	
+	$CenterContainer/PromptLabel.text = "Tap here to launch"
+	
+	hint_timer.start(4.0)

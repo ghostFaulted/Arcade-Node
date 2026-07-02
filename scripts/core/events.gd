@@ -26,3 +26,4 @@ signal paddle_laser_state_changed(is_active: bool)
 signal paddle_magnet_state_changed(is_active: bool)
 signal ball_caught
 signal multiball_activated
+signal ball_aimed

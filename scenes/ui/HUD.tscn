@@ -7,13 +7,6 @@
 
 [sub_resource type="Theme" id="Theme_kw0id"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ig75s"]
-bg_color = Color(1, 1, 1, 0.70000005)
-corner_radius_top_left = 100
-corner_radius_top_right = 100
-corner_radius_bottom_right = 100
-corner_radius_bottom_left = 100
-
 [node name="Hud" type="CanvasLayer" unique_id=2132756405]
 process_mode = 3
 script = ExtResource("1_kw0id")
@@ -151,31 +144,12 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer" unique_id=985622000]
+[node name="PromptLabel" type="Label" parent="CenterContainer" unique_id=985622000]
 layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 15
-
-[node name="TextLeft" type="Label" parent="CenterContainer/HBoxContainer" unique_id=49634811]
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 48
-text = "Tap"
-horizontal_alignment = 2
-
-[node name="LaunchButtonGraphic" type="Panel" parent="CenterContainer/HBoxContainer" unique_id=25549419]
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_ig75s")
-
-[node name="TextRight" type="Label" parent="CenterContainer/HBoxContainer" unique_id=1053801666]
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 48
-text = "to launch"
+theme_override_font_sizes/font_size = 44
+text = "Slide slider to aim"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="PaddleSlot" parent="." unique_id=1206637269 instance=ExtResource("4_ig75s")]
 
@@ -185,7 +159,6 @@ slot_type = "Ball"
 [connection signal="pressed" from="MarginContainer/HBoxContainer/PauseButton" to="." method="_on_pause_button_pressed"]
 [connection signal="pressed" from="Overlay/CenterContainer/VBoxContainer/RestartButton" to="." method="_on_restart_button_pressed"]
 [connection signal="pressed" from="Overlay/CenterContainer/VBoxContainer/MenuButton" to="." method="_on_menu_button_pressed"]
-[connection signal="pressed" from="Overlay/CenterContainer/VBoxContainer/NextLevelButton" to="." method="_on_restart_button_pressed"]
 [connection signal="pressed" from="Overlay/CenterContainer/VBoxContainer/NextLevelButton" to="." method="_on_next_level_button_pressed"]
 [connection signal="pressed" from="PauseOverlay/CenterContainer/VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]
 [connection signal="pressed" from="PauseOverlay/CenterContainer/VBoxContainer/PauseRestartButton" to="." method="_on_pause_restart_button_pressed"]

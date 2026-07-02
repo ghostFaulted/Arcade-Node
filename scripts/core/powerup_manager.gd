@@ -8,13 +8,13 @@ var chance_step: float = 0.03
 var max_on_screen: int = 3
 
 var powerup_pool = {
-	"slow_ball": 1000,
-	"big_ball": 1000,
-	"multiball": 1000,
+	"slow_ball": 30,
+	"big_ball": 30,
+	"multiball": 30,
 	"wide_paddle": 30,
 	"shield": 30,
 	"laser": 30,
-	"extra_life": 5,
+	"extra_life": 30,
 	"magnet": 30
 }
 

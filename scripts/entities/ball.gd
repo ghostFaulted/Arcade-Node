@@ -3,7 +3,8 @@ extends CharacterBody2D
 @export var min_speed: float = 850.0
 @export var max_speed: float = 1300.0
 @export var speed_step: float = 10.0
-@export var slow_speed: float = 600.0
+@export var slow_speed: float = 550.0
+@export var sway_speed: float = 0.75
 @export var direction: Vector2 = Vector2.ZERO
 const MAX_BOUNCE_ANGLE: float = PI / 3.0
 const MAX_LAUNCH_ANGLE: float = deg_to_rad(60.0)
@@ -13,6 +14,8 @@ var attach_offset_y: float = 0.0
 var damage: int = 1
 var visual_scale: float = 1.0
 var is_slowed: bool = false 
+var is_swaying: bool = true 
+var sway_time: float = 0.0
 var launch_direction: Vector2 = Vector2.UP
 @onready var trajectory_line = $TrajectoryLine
 var attach_offset_x: float = 0.0
@@ -58,6 +61,7 @@ func _ready() -> void:
 	Events.ball_launched.connect(_on_launch)
 	Events.ball_big_state_changed.connect(_on_ball_big_state_changed)
 	Events.ball_slow_state_changed.connect(_on_ball_slow_state_changed)
+	Events.paddle_exact_x_moved.connect(_on_exact_x_moved)
 	
 	for other_ball in get_tree().get_nodes_in_group("ball"):
 		if other_ball != self:
@@ -65,6 +69,9 @@ func _ready() -> void:
 			other_ball.add_collision_exception_with(self)
 			
 	add_to_group("ball")
+	
+	is_swaying = true
+	sway_time = 0.0
 	
 	if is_launched:
 		trajectory_line.visible = false
@@ -102,6 +109,10 @@ func _physics_process(delta: float) -> void:
 				attach_node = collider
 				collider.attached_ball = self
 				trajectory_line.visible = true
+				
+				is_swaying = true
+				sway_time = 0.0
+				
 				Events.ball_caught.emit()
 				continue
 			if normal.y < -0.2 and direction.y > 0:
@@ -109,7 +120,7 @@ func _physics_process(delta: float) -> void:
 				var normalized_offset = clampf(offset / collider.half_width, -1.0, 1.0)
 				var bounce_angle = normalized_offset * MAX_BOUNCE_ANGLE
 				direction = Vector2.UP.rotated(bounce_angle).normalized()
-				_increase_global_speed(speed_step) # ФІКС
+				_increase_global_speed(speed_step)
 			else:
 				var paddle_shape = collider.get_node("CollisionShape2D").shape
 				var paddle_top_y = collider.global_position.y - paddle_shape.radius
@@ -128,9 +139,9 @@ func _physics_process(delta: float) -> void:
 			if not collider in damaged_objects:
 				collider.take_damage(damage)
 				damaged_objects.append(collider)
-				_increase_global_speed(speed_step) # ФІКС
+				_increase_global_speed(speed_step)
 		elif not collider.is_in_group("paddle") and normal.y > 0.8:
-			_increase_global_speed(5.0 * speed_step) # ФІКС
+			_increase_global_speed(5.0 * speed_step)
 		var remainder = collision.get_remainder()
 		movement = direction * remainder.length()
 
@@ -156,14 +167,21 @@ func _increase_global_speed(amount: float) -> void:
 
 func _update_trajectory() -> void:
 	if not is_instance_valid(attach_node): return 
-	var p_min = attach_node.min_x
-	var p_max = attach_node.max_x
-	var center_x = (p_max + p_min) / 2.0
-	var half_range = (p_max - p_min) / 2.0
-	var offset = global_position.x - center_x
-	var normalized_pos = clampf(offset / half_range, -1.0, 1.0) 
-	var angle = -normalized_pos * MAX_LAUNCH_ANGLE
-	launch_direction = Vector2.UP.rotated(angle).normalized()
+	
+	if is_swaying:
+		sway_time += get_process_delta_time()
+		var angle = sin(sway_time * sway_speed) * MAX_LAUNCH_ANGLE
+		launch_direction = Vector2.UP.rotated(angle).normalized()
+	else:
+		var p_min = attach_node.min_x
+		var p_max = attach_node.max_x
+		var center_x = (p_max + p_min) / 2.0
+		var half_range = (p_max - p_min) / 2.0
+		var offset = global_position.x - center_x
+		var normalized_pos = clampf(offset / half_range, -1.0, 1.0) 
+		var angle = -normalized_pos * MAX_LAUNCH_ANGLE
+		launch_direction = Vector2.UP.rotated(angle).normalized()
+		
 	trajectory_line.clear_points()
 	trajectory_line.add_point(Vector2.ZERO) 
 	var space_state = get_world_2d().direct_space_state
@@ -207,6 +225,11 @@ func _on_launch() -> void:
 		if is_instance_valid(attach_node) and attach_node.is_in_group("paddle"):
 			if attach_node.get("attached_ball") == self:
 				attach_node.attached_ball = null
+
+func _on_exact_x_moved(new_x: float) -> void:
+	if is_swaying:
+		is_swaying = false
+		Events.ball_aimed.emit()
 		
 func _draw() -> void:
 	var radius = $CollisionShape2D.shape.radius * visual_scale
