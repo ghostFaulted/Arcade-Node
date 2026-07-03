@@ -4,7 +4,7 @@ extends CharacterBody2D
 @export var max_speed: float = 1300.0
 @export var speed_step: float = 10.0
 @export var slow_speed: float = 550.0
-@export var sway_speed: float = 0.75
+@export var sway_speed: float = 0.25
 @export var direction: Vector2 = Vector2.ZERO
 const MAX_BOUNCE_ANGLE: float = PI / 3.0
 const MAX_LAUNCH_ANGLE: float = deg_to_rad(60.0)
@@ -165,6 +165,44 @@ func _increase_global_speed(amount: float) -> void:
 			if b.current_speed != new_speed:
 				b.current_speed = new_speed
 
+func _sweep_cast(space_state: PhysicsDirectSpaceState2D, start: Vector2, dir: Vector2, radius: float, exclude: Array) -> Dictionary:
+	var max_distance = 2000.0
+	var perp = Vector2(-dir.y, dir.x) * (radius - 0.5)
+	
+	var q_center = PhysicsRayQueryParameters2D.create(start, start + dir * max_distance)
+	var q_left = PhysicsRayQueryParameters2D.create(start + perp, start + perp + dir * max_distance)
+	var q_right = PhysicsRayQueryParameters2D.create(start - perp, start - perp + dir * max_distance)
+	
+	for q in [q_center, q_left, q_right]:
+		q.exclude = exclude
+		q.collide_with_areas = false
+		
+	var r_center = space_state.intersect_ray(q_center)
+	var r_left = space_state.intersect_ray(q_left)
+	var r_right = space_state.intersect_ray(q_right)
+	
+	var d_center = r_center.position.distance_to(start) if r_center else INF
+	var d_left = r_left.position.distance_to(start + perp) if r_left else INF
+	var d_right = r_right.position.distance_to(start - perp) if r_right else INF
+	
+	var min_dist = minf(d_center, minf(d_left, d_right))
+	
+	if min_dist == INF:
+		return {}
+		
+	var result_dict = {}
+	result_dict["distance"] = min_dist
+	result_dict["position"] = start + dir * min_dist
+	
+	if min_dist == d_center:
+		result_dict["normal"] = r_center.normal
+	elif min_dist == d_left:
+		result_dict["normal"] = r_left.normal
+	else:
+		result_dict["normal"] = r_right.normal
+		
+	return result_dict
+
 func _update_trajectory() -> void:
 	if not is_instance_valid(attach_node): return 
 	
@@ -184,38 +222,39 @@ func _update_trajectory() -> void:
 		
 	trajectory_line.clear_points()
 	trajectory_line.add_point(Vector2.ZERO) 
+	
 	var space_state = get_world_2d().direct_space_state
-	var current_global_pos = global_position
-	var current_dir = launch_direction
-	var max_distance = 2000.0
-	var query1 = PhysicsRayQueryParameters2D.create(current_global_pos, current_global_pos + current_dir * max_distance)
-	query1.exclude = [self.get_rid(), attach_node.get_rid()] 
-	query1.collide_with_areas = false 
-	var result1 = space_state.intersect_ray(query1)
-	if result1:
-		var hit_pos1_local = result1.position - global_position
+	var exclude = [self.get_rid(), attach_node.get_rid()]
+	var radius = $CollisionShape2D.shape.radius * visual_scale
+	
+	var hit1 = _sweep_cast(space_state, global_position, launch_direction, radius, exclude)
+	if hit1:
+		var hit_pos1_local = hit1.position - global_position
 		trajectory_line.add_point(hit_pos1_local)
-		var normal1 = result1.normal
-		var bounce_dir = current_dir.bounce(normal1)
-		var ray2_start = result1.position + normal1 * 2.0 
-		var query2 = PhysicsRayQueryParameters2D.create(ray2_start, ray2_start + bounce_dir * max_distance)
-		query2.exclude = [self.get_rid(), attach_node.get_rid()]
-		query2.collide_with_areas = false
-		var result2 = space_state.intersect_ray(query2)
+		
+		var normal1 = hit1.normal
+		var bounce_dir = launch_direction.bounce(normal1).normalized()
+		
+		var ray2_start = hit1.position + normal1 * 2.0 
+		
+		var hit2 = _sweep_cast(space_state, ray2_start, bounce_dir, radius, exclude)
+		
 		var ray2_end_global: Vector2
-		if result2:
-			ray2_end_global = result2.position
+		if hit2:
+			ray2_end_global = hit2.position
 		else:
-			ray2_end_global = ray2_start + bounce_dir * max_distance
+			ray2_end_global = ray2_start + bounce_dir * 2000.0
+			
 		var floor_y = global_position.y
 		if ray2_end_global.y > floor_y:
 			if bounce_dir.y > 0:
 				var t = (floor_y - ray2_start.y) / bounce_dir.y
 				ray2_end_global = ray2_start + bounce_dir * t
+				
 		var hit_pos2_local = ray2_end_global - global_position
 		trajectory_line.add_point(hit_pos2_local)
 	else:
-		trajectory_line.add_point(current_dir * max_distance)
+		trajectory_line.add_point(launch_direction * 2000.0)
 
 func _on_launch() -> void:
 	if not is_launched:

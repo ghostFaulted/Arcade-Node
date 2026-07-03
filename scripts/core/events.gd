@@ -3,6 +3,7 @@ extends Node
 var vertical_speed_scale: float = 1.0
 
 signal brick_destroyed(points: int)
+signal bonus_points_gained(points: int)
 signal ball_lost
 signal level_ready(total_bricks: int)
 signal score_updated(new_score: int)

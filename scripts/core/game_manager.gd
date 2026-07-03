@@ -4,9 +4,11 @@ const BallScene = preload("res://scenes/entities/Ball.tscn")
 var score: int = 0
 var lives: int = 3
 var bricks_remaining: int = 0
+const MAX_LIVES: int = 99
 
 func _ready() -> void:
 	Events.brick_destroyed.connect(_on_brick_destroyed)
+	Events.bonus_points_gained.connect(_on_bonus_points_gained)
 	Events.ball_lost.connect(_on_ball_lost)
 	Events.level_ready.connect(_on_level_ready)
 	Events.score_updated.emit.call_deferred(0)
@@ -16,7 +18,6 @@ func _ready() -> void:
 	var current_aspect = screen_size.y / screen_size.x
 	var base_aspect = 20.0 / 9.0
 	Events.vertical_speed_scale = current_aspect / base_aspect
-	print("[DIAGNOSTIC] Aspect Ratio: ", current_aspect, " | Speed Multiplier: ", Events.vertical_speed_scale)
 	var safe_area = DisplayServer.get_display_safe_area()
 	var top_ratio = float(safe_area.position.y) / float(DisplayServer.screen_get_size().y) if DisplayServer.screen_get_size().y > 0 else 0.0
 	var safe_margin_top = top_ratio * screen_size.y
@@ -42,10 +43,14 @@ func _on_brick_destroyed(points: int) -> void:
 	if bricks_remaining == 0:
 		Events.level_completed.emit()
 		get_tree().paused = true
+
+func _on_bonus_points_gained(points: int) -> void:
+	if not is_inside_tree(): return
+	score += points
+	Events.score_updated.emit(score)
 	
 func _on_ball_lost() -> void:
 	if not is_inside_tree(): return
-	
 	var active_balls = 0
 	for b in get_tree().get_nodes_in_group("ball"):
 		if not b.is_queued_for_deletion():
@@ -76,17 +81,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		Events.ball_launched.emit()
 		
 func _on_life_gained() -> void:
-	lives += 1
-	Events.lives_updated.emit(lives)
-	print("[GAME] Extra life gained! Total lives: ", lives)
+	if lives < MAX_LIVES:
+		lives += 1
+		Events.lives_updated.emit(lives)
+	else:
+		_on_bonus_points_gained(500)
 
 func _on_multiball_activated() -> void:
 	if not is_inside_tree(): return
 	var paddle = get_tree().get_first_node_in_group("paddle")
 	if not is_instance_valid(paddle): return
-	
 	var directions = [Vector2(-1, -1).normalized(), Vector2(1, -1).normalized()]
-	
 	for dir in directions:
 		var ball = BallScene.instantiate()
 		ball.global_position = paddle.global_position - Vector2(0, 40)

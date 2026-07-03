@@ -64,6 +64,15 @@ func _on_request_drop(spawn_pos: Vector2) -> void:
 			dynamic_step = chance_step / 2.0
 		elif active_count == 2:
 			dynamic_step = chance_step / 4.0
+			
+		var active_balls = 0
+		for b in get_tree().get_nodes_in_group("ball"):
+			if not b.is_queued_for_deletion():
+				active_balls += 1
+				
+		if active_balls > 1:
+			dynamic_step = dynamic_step / float(active_balls)
+			
 		current_chance += dynamic_step
 
 func _spawn_powerup(pos: Vector2) -> void:
@@ -94,7 +103,6 @@ func _get_weighted_random() -> String:
 	return powerup_pool.keys()[0]
 
 func _on_powerup_collected(type: String) -> void:
-	print("[POWERUP] Collected: ", type)
 	if type in group_instant:
 		_apply_instant_powerup(type)
 	elif type in group_paddle:
@@ -103,7 +111,6 @@ func _on_powerup_collected(type: String) -> void:
 		_apply_ball_powerup(type)
 
 func _apply_instant_powerup(type: String) -> void:
-	print("[POWERUP] Instant action applied: ", type)
 	if type == "extra_life":
 		Events.life_gained.emit()
 	elif type == "multiball":
@@ -115,7 +122,6 @@ func _apply_paddle_powerup(type: String) -> void:
 	active_paddle_powerup = type
 	current_paddle_duration = _get_powerup_duration(type)
 	paddle_timer.start(current_paddle_duration)
-	print("[POWERUP] Paddle Power-up ACTIVATED: ", type, " | Timer: ", current_paddle_duration, "s")
 	if type == "wide_paddle":
 		Events.paddle_size_changed.emit(170)
 	elif type == "shield":
@@ -131,7 +137,6 @@ func _apply_ball_powerup(type: String) -> void:
 	active_ball_powerup = type
 	current_ball_duration = _get_powerup_duration(type)
 	ball_timer.start(current_ball_duration)
-	print("[POWERUP] Ball Power-up ACTIVATED: ", type, " | Timer: ", current_ball_duration, "s")
 	if type == "slow_ball":
 		Events.ball_slow_state_changed.emit(true)
 	elif type == "big_ball":
@@ -146,7 +151,6 @@ func _on_ball_timer_timeout() -> void:
 	active_ball_powerup = ""
 
 func _remove_paddle_powerup(type: String) -> void:
-	print("[POWERUP] Paddle Power-up DEACTIVATED: ", type)
 	if type == "wide_paddle":
 		Events.paddle_size_changed.emit(130.0)
 	elif type == "shield":
@@ -157,7 +161,6 @@ func _remove_paddle_powerup(type: String) -> void:
 		Events.paddle_magnet_state_changed.emit(false)
 
 func _remove_ball_powerup(type: String) -> void:
-	print("[POWERUP] Ball Power-up DEACTIVATED: ", type)
 	if type == "slow_ball":
 		Events.ball_slow_state_changed.emit(false)
 	elif type == "big_ball":
@@ -173,8 +176,6 @@ func reset_all_powerups() -> void:
 		_remove_ball_powerup(active_ball_powerup)
 		active_ball_powerup = ""
 		ball_timer.stop()
-	
-	print("[POWERUP] All power-ups have been RESET.")
 	
 func _get_powerup_duration(type: String) -> float:
 	if type == "big_ball": return 15.0
