@@ -41,6 +41,7 @@ func _on_brick_destroyed(points: int) -> void:
 	Events.score_updated.emit(score)
 	bricks_remaining -= 1
 	if bricks_remaining == 0:
+		LevelManager.unlock_next_level(LevelManager.current_level_index)
 		Events.level_completed.emit()
 		get_tree().paused = true
 

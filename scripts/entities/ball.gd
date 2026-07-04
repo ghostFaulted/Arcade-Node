@@ -4,7 +4,7 @@ extends CharacterBody2D
 @export var max_speed: float = 1300.0
 @export var speed_step: float = 10.0
 @export var slow_speed: float = 550.0
-@export var sway_speed: float = 0.25
+@export var sway_speed: float = 0.30 
 @export var direction: Vector2 = Vector2.ZERO
 const MAX_BOUNCE_ANGLE: float = PI / 3.0
 const MAX_LAUNCH_ANGLE: float = deg_to_rad(60.0)
@@ -131,10 +131,17 @@ func _physics_process(delta: float) -> void:
 				direction = Vector2(offset_dir * 0.5, -1.0).normalized() 
 		else:
 			direction = direction.bounce(normal).normalized()
+			
 		if abs(direction.y) < 0.2:
 			var dir_sign = sign(direction.y) if direction.y != 0 else 1.0
 			direction.y = 0.2 * dir_sign
 			direction = direction.normalized()
+			
+		if abs(direction.x) < 0.02:
+			var noise = 0.05 if randf() > 0.5 else -0.05
+			direction.x += noise
+			direction = direction.normalized()
+			
 		if collider.has_method("take_damage"):
 			if not collider in damaged_objects:
 				collider.take_damage(damage)
@@ -142,6 +149,7 @@ func _physics_process(delta: float) -> void:
 				_increase_global_speed(speed_step)
 		elif not collider.is_in_group("paddle") and normal.y > 0.8:
 			_increase_global_speed(5.0 * speed_step)
+			
 		var remainder = collision.get_remainder()
 		movement = direction * remainder.length()
 
@@ -168,7 +176,6 @@ func _increase_global_speed(amount: float) -> void:
 func _sweep_cast(space_state: PhysicsDirectSpaceState2D, start: Vector2, dir: Vector2, radius: float, exclude: Array) -> Dictionary:
 	var max_distance = 2000.0
 	var perp = Vector2(-dir.y, dir.x) * (radius - 0.5)
-	
 	var q_center = PhysicsRayQueryParameters2D.create(start, start + dir * max_distance)
 	var q_left = PhysicsRayQueryParameters2D.create(start + perp, start + perp + dir * max_distance)
 	var q_right = PhysicsRayQueryParameters2D.create(start - perp, start - perp + dir * max_distance)
@@ -186,20 +193,15 @@ func _sweep_cast(space_state: PhysicsDirectSpaceState2D, start: Vector2, dir: Ve
 	var d_right = r_right.position.distance_to(start - perp) if r_right else INF
 	
 	var min_dist = minf(d_center, minf(d_left, d_right))
-	
-	if min_dist == INF:
-		return {}
+	if min_dist == INF: return {}
 		
 	var result_dict = {}
 	result_dict["distance"] = min_dist
-	result_dict["position"] = start + dir * min_dist
+	result_dict["position"] = start + dir * min_dist 
 	
-	if min_dist == d_center:
-		result_dict["normal"] = r_center.normal
-	elif min_dist == d_left:
-		result_dict["normal"] = r_left.normal
-	else:
-		result_dict["normal"] = r_right.normal
+	if min_dist == d_center: result_dict["normal"] = r_center.normal
+	elif min_dist == d_left: result_dict["normal"] = r_left.normal
+	else: result_dict["normal"] = r_right.normal
 		
 	return result_dict
 
@@ -231,19 +233,13 @@ func _update_trajectory() -> void:
 	if hit1:
 		var hit_pos1_local = hit1.position - global_position
 		trajectory_line.add_point(hit_pos1_local)
-		
 		var normal1 = hit1.normal
 		var bounce_dir = launch_direction.bounce(normal1).normalized()
-		
 		var ray2_start = hit1.position + normal1 * 2.0 
-		
 		var hit2 = _sweep_cast(space_state, ray2_start, bounce_dir, radius, exclude)
-		
 		var ray2_end_global: Vector2
-		if hit2:
-			ray2_end_global = hit2.position
-		else:
-			ray2_end_global = ray2_start + bounce_dir * 2000.0
+		if hit2: ray2_end_global = hit2.position
+		else: ray2_end_global = ray2_start + bounce_dir * 2000.0
 			
 		var floor_y = global_position.y
 		if ray2_end_global.y > floor_y:
