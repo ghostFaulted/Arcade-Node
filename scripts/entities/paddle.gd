@@ -11,6 +11,7 @@ const LaserScene = preload("res://scenes/entities/LaserBeam.tscn")
 var base_color: Color = Color.DEEP_PINK
 var is_magnet_active: bool = false
 var attached_ball: Node2D = null
+var is_exiting: bool = false
 
 func _ready() -> void:
 	add_to_group("paddle")
@@ -20,6 +21,7 @@ func _ready() -> void:
 	Events.paddle_laser_state_changed.connect(_on_paddle_laser_state_changed)
 	$LaserTimer.timeout.connect(_on_laser_timer_timeout)
 	Events.paddle_magnet_state_changed.connect(_on_paddle_magnet_state_changed)
+	Events.level_cleared_start_anim.connect(_on_level_cleared)
 
 func _on_layout_calculated(play_area: Rect2, slider_y: float, paddle_y: float) -> void:
 	current_play_area = play_area
@@ -31,10 +33,11 @@ func _on_layout_calculated(play_area: Rect2, slider_y: float, paddle_y: float) -
 	target_y = paddle_y
 
 func _on_exact_x_moved(new_x: float) -> void:
-	target_x = clampf(new_x, min_x, max_x)
+	if not is_exiting:
+		target_x = clampf(new_x, min_x, max_x)
 
 func _process(delta: float) -> void:
-	if screen_width > 0:
+	if screen_width > 0 and not is_exiting:
 		global_position = Vector2(target_x, target_y)
 		
 func _on_paddle_size_changed(new_width: float) -> void:
@@ -74,4 +77,16 @@ func _on_paddle_magnet_state_changed(active: bool) -> void:
 		if is_instance_valid(attached_ball):
 			Events.ball_launched.emit() 
 	$Panel.add_theme_stylebox_override("panel", style)
+
+func _on_level_cleared() -> void:
+	is_exiting = true 
+	
+	var exit_target_x = current_play_area.position.x + current_play_area.size.x + half_width + 100.0
+	var tween = create_tween()
+	
+	tween.tween_property(self, "global_position:x", exit_target_x, 1.2).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN)
+	
+	tween.finished.connect(Events.level_completed.emit)
+	
+	
 	

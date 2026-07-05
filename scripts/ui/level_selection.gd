@@ -15,6 +15,8 @@ func _ready() -> void:
 		btn.add_theme_font_size_override("font_size", 56)
 		btn.text = str(i + 1)
 		
+		btn.mouse_filter = Control.MOUSE_FILTER_PASS
+		
 		if i <= LevelManager.max_unlocked_level or LevelManager.GOD_MODE:
 			btn.pressed.connect(func(): start_level(i))
 		else:

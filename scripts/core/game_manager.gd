@@ -42,8 +42,7 @@ func _on_brick_destroyed(points: int) -> void:
 	bricks_remaining -= 1
 	if bricks_remaining == 0:
 		LevelManager.unlock_next_level(LevelManager.current_level_index)
-		Events.level_completed.emit()
-		get_tree().paused = true
+		Events.level_cleared_start_anim.emit()
 
 func _on_bonus_points_gained(points: int) -> void:
 	if not is_inside_tree(): return

@@ -7,6 +7,7 @@ var current_paddle_y: float = 0.0
 func _ready() -> void:
 	Events.layout_calculated.connect(_on_layout_calculated)
 	Events.shield_state_changed.connect(_on_shield_state_changed)
+	Events.level_cleared_start_anim.connect(_on_level_cleared)
 	
 	$Killzone.body_entered.connect(_on_killzone_body_entered)
 	$Killzone.area_entered.connect(_on_killzone_area_entered)
@@ -17,11 +18,7 @@ func _ready() -> void:
 	$Killzone.collision_mask = 1
 	
 	var col_shape = $Killzone/BottomZone
-	if col_shape == null:
-		print("[CRITICAL ERROR] Killzone has NO BottomZone node!")
-	elif col_shape.shape == null:
-		print("[CRITICAL ERROR] Killzone BottomZone has NO SHAPE assigned!")
-	else:
+	if col_shape != null and col_shape.shape != null:
 		col_shape.disabled = false
 
 func _on_layout_calculated(play_area: Rect2, slider_y: float, paddle_y: float) -> void:
@@ -76,7 +73,6 @@ func _on_killzone_body_entered(body: Node2D) -> void:
 		
 func _on_killzone_area_entered(area: Area2D) -> void:
 	if area.is_in_group("powerups"):
-		print("[DEBUG] Power-up fell into abyss and was destroyed: ", area.type)
 		Events.powerup_freed.emit() 
 		area.queue_free()
 		
@@ -84,3 +80,6 @@ func _on_shield_state_changed(active: bool) -> void:
 	is_shield_active = active
 	$ShieldWall/Shape.set_deferred("disabled", not active)
 	queue_redraw()
+
+func _on_level_cleared() -> void:
+	$Walls/RightWall.set_deferred("disabled", true)

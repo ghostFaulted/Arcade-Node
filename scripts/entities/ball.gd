@@ -62,6 +62,7 @@ func _ready() -> void:
 	Events.ball_big_state_changed.connect(_on_ball_big_state_changed)
 	Events.ball_slow_state_changed.connect(_on_ball_slow_state_changed)
 	Events.paddle_exact_x_moved.connect(_on_exact_x_moved)
+	Events.level_cleared_start_anim.connect(queue_free)
 	
 	for other_ball in get_tree().get_nodes_in_group("ball"):
 		if other_ball != self:
