@@ -1,7 +1,7 @@
 extends Control
 
 func _on_start_button_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/ui/LevelSelection.tscn")
+	SceneTransition.change_scene("res://scenes/ui/LevelSelection.tscn")
 	
 func _ready() -> void:
 	var app_version = ProjectSettings.get_setting("application/config/version")

@@ -27,7 +27,7 @@ func _ready() -> void:
 
 func start_level(index: int) -> void:
 	LevelManager.current_level_index = index
-	get_tree().change_scene_to_file("res://scenes/Main.tscn")
+	SceneTransition.change_scene("res://scenes/Main.tscn")
 	
 func show_locked_message(target_index: int) -> void:
 	$LockedPopup/CenterContainer/VBoxContainer/MessageLabel.text = "You need to complete\nLevel " + str(target_index) + " first!"
@@ -46,4 +46,4 @@ func apply_safe_area() -> void:
 	$MarginContainer.add_theme_constant_override("margin_top", safe_margin_top + 20)
 	
 func _on_back_button_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/ui/MainMenu.tscn")
+	SceneTransition.change_scene("res://scenes/ui/MainMenu.tscn")

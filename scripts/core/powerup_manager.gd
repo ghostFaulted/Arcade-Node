@@ -14,7 +14,7 @@ var powerup_pool = {
 	"wide_paddle": 30,
 	"shield": 30,
 	"laser": 30,
-	"extra_life": 30,
+	"extra_life": 5,
 	"magnet": 30
 }
 
@@ -34,12 +34,14 @@ func _ready() -> void:
 	Events.powerup_collected.connect(_on_powerup_collected)
 	Events.ball_spawned.connect(reset_all_powerups)
 	Events.level_ready.connect(_on_level_ready)
-	Events.level_completed.connect(_on_level_ended)
+	Events.level_cleared_start_anim.connect(_on_level_ended)
 	Events.game_over.connect(_on_level_ended)
+	
 	paddle_timer = Timer.new()
 	paddle_timer.one_shot = true
 	paddle_timer.timeout.connect(_on_paddle_timer_timeout)
 	add_child(paddle_timer)
+	
 	ball_timer = Timer.new()
 	ball_timer.one_shot = true
 	ball_timer.timeout.connect(_on_ball_timer_timeout)
@@ -176,6 +178,9 @@ func reset_all_powerups() -> void:
 		_remove_ball_powerup(active_ball_powerup)
 		active_ball_powerup = ""
 		ball_timer.stop()
+		
+	for drop in get_tree().get_nodes_in_group("powerups"):
+		drop.queue_free()
 	
 func _get_powerup_duration(type: String) -> float:
 	if type == "big_ball": return 15.0

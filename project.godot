@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Arcade-Node"
-config/version="0.13.1"
+config/version="0.13.2"
 run/main_scene="uid://c3m6txv1724ll"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
@@ -21,6 +21,7 @@ config/icon="res://icon.svg"
 Events="*uid://c2ooev7j1gp2u"
 LevelManager="*uid://cm5c0x75b7ef0"
 PowerUpManager="*uid://if4jmy0b3m03"
+SceneTransition="*uid://dtxendft8bphm"
 
 [display]
 

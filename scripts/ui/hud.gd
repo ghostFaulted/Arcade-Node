@@ -56,7 +56,7 @@ func _on_restart_button_pressed() -> void:
 	if not is_inside_tree(): return
 	get_tree().paused = false
 	is_game_over = false
-	get_tree().reload_current_scene()
+	SceneTransition.reload_scene()
 
 func _on_paddle_controller_value_changed(value: float) -> void:
 	Events.paddle_slider_moved.emit(value)
@@ -96,7 +96,7 @@ func _on_resume_button_pressed() -> void:
 func _on_menu_button_pressed() -> void:
 	if not is_inside_tree(): return
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/ui/LevelSelection.tscn")
+	SceneTransition.change_scene("res://scenes/ui/LevelSelection.tscn")
 	
 func apply_safe_area() -> void:
 	var safe_area = DisplayServer.get_display_safe_area()
@@ -111,17 +111,15 @@ func _on_pause_restart_button_pressed() -> void:
 	if not is_inside_tree(): return
 	get_tree().paused = false
 	is_game_over = false
-	get_tree().reload_current_scene()
+	SceneTransition.reload_scene()
 	
 func _on_ball_spawned() -> void:
 	if not is_inside_tree(): return
 	is_waiting_for_launch = true
 	has_aimed = false
 	$CenterContainer/PromptLabel.visible = true
-	
-	$CenterContainer/PromptLabel.text = "Move slider to aim"
+	$CenterContainer/PromptLabel.text = "Slide slider to aim"
 	$CenterContainer/PromptLabel.modulate.a = 0.0
-	
 	hint_timer.start(4.0)
 	
 func _on_ball_launched() -> void:
@@ -135,7 +133,7 @@ func _on_next_level_button_pressed() -> void:
 	get_tree().paused = false
 	is_game_over = false
 	LevelManager.current_level_index += 1
-	get_tree().reload_current_scene()
+	SceneTransition.reload_scene()
 	
 func _on_hint_timer_timeout() -> void:
 	if is_waiting_for_launch and not is_game_over:
@@ -143,11 +141,7 @@ func _on_hint_timer_timeout() -> void:
 
 func _on_ball_aimed() -> void:
 	if not is_inside_tree() or not is_waiting_for_launch: return
-
 	has_aimed = true
-	
 	$CenterContainer/PromptLabel.modulate.a = 0.0
-	
 	$CenterContainer/PromptLabel.text = "Tap here to launch"
-	
 	hint_timer.start(4.0)

@@ -39,10 +39,21 @@ func _update_visuals() -> void:
 func _draw() -> void:
 	var center = size / 2.0
 	var radius = (size.x / 2.0) - (line_thickness / 2.0)
+	
 	draw_circle(center, radius, bg_color)
+	
 	if current_ratio > 0.0 and active_powerup != "":
 		var start_angle = -PI/2.0 + (TAU * (1.0 - current_ratio))
 		var end_angle = -PI/2.0 + TAU 
+		
 		draw_arc(center, radius, start_angle, end_angle, 64, ring_color, line_thickness, true)
 	else:
 		draw_arc(center, radius, 0.0, TAU, 64, outline_color, outline_thickness, true)
+		
+		if slot_type == "Paddle":
+			var p_width = 18.0
+			var p_left = center - Vector2(p_width / 2.0, 0)
+			var p_right = center + Vector2(p_width / 2.0, 0)
+			draw_line(p_left, p_right, Color.DEEP_PINK, 8.0, true)
+		elif slot_type == "Ball":
+			draw_circle(center, 5.0, Color.YELLOW)
