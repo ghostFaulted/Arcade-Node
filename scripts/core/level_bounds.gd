@@ -3,11 +3,13 @@ extends Node2D
 var current_play_area: Rect2
 var is_shield_active: bool = false
 var current_paddle_y: float = 0.0
+var is_door_open: bool = false
 
 func _ready() -> void:
 	Events.layout_calculated.connect(_on_layout_calculated)
 	Events.shield_state_changed.connect(_on_shield_state_changed)
-	Events.level_cleared_start_anim.connect(_on_level_cleared)
+	Events.level_cleared_start_anim.connect(_on_level_cleared) 
+	Events.door_opened.connect(_on_door_opened)
 	
 	$Killzone.body_entered.connect(_on_killzone_body_entered)
 	$Killzone.area_entered.connect(_on_killzone_area_entered)
@@ -57,14 +59,27 @@ func _draw() -> void:
 	var top_right = Vector2(current_play_area.end.x, current_play_area.position.y)
 	var bottom_left = Vector2(current_play_area.position.x, current_play_area.end.y)
 	var bottom_right = Vector2(current_play_area.end.x, current_play_area.end.y)
+	
 	draw_line(bottom_left, top_left, line_color, line_thickness)
 	draw_line(top_left, top_right, line_color, line_thickness)
-	draw_line(top_right, bottom_right, line_color, line_thickness)
+	
+	if is_door_open:
+		var door_top = current_paddle_y - 40.0
+		var door_bottom = current_paddle_y + 40.0
+		draw_line(top_right, Vector2(top_right.x, door_top), line_color, line_thickness)
+		draw_line(Vector2(bottom_right.x, door_bottom), bottom_right, line_color, line_thickness)
+	else:
+		draw_line(top_right, bottom_right, line_color, line_thickness)
+		
 	if is_shield_active:
 		var shield_y = current_paddle_y + 30.0
 		var s_left = Vector2(current_play_area.position.x, shield_y)
 		var s_right = Vector2(current_play_area.end.x, shield_y)
 		draw_line(s_left, s_right, Color.CYAN, 6.0)
+
+func _on_door_opened() -> void:
+	is_door_open = true
+	queue_redraw()
 
 func _on_killzone_body_entered(body: Node2D) -> void:
 	if body.is_in_group("ball"):

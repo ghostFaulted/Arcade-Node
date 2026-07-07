@@ -14,8 +14,9 @@ var powerup_pool = {
 	"wide_paddle": 30,
 	"shield": 30,
 	"laser": 30,
+	"magnet": 30,
 	"extra_life": 5,
-	"magnet": 30
+	"level_skip": 2 
 }
 
 var active_paddle_powerup: String = ""
@@ -26,7 +27,7 @@ var current_paddle_duration: float = 10.0
 var current_ball_duration: float = 10.0
 var group_paddle = ["wide_paddle", "shield", "laser", "magnet"]
 var group_ball = ["slow_ball", "big_ball"]
-var group_instant = ["multiball", "extra_life"]
+var group_instant = ["multiball", "extra_life", "level_skip"]
 var is_level_active: bool = false
 
 func _ready() -> void:
@@ -36,12 +37,10 @@ func _ready() -> void:
 	Events.level_ready.connect(_on_level_ready)
 	Events.level_cleared_start_anim.connect(_on_level_ended)
 	Events.game_over.connect(_on_level_ended)
-	
 	paddle_timer = Timer.new()
 	paddle_timer.one_shot = true
 	paddle_timer.timeout.connect(_on_paddle_timer_timeout)
 	add_child(paddle_timer)
-	
 	ball_timer = Timer.new()
 	ball_timer.one_shot = true
 	ball_timer.timeout.connect(_on_ball_timer_timeout)
@@ -90,6 +89,7 @@ func _spawn_powerup(pos: Vector2) -> void:
 	elif chosen_type == "shield": drop.modulate = Color.CYAN
 	elif chosen_type == "laser": drop.modulate = Color.YELLOW
 	elif chosen_type == "magnet": drop.modulate = Color.PURPLE
+	elif chosen_type == "level_skip": drop.modulate = Color.GOLD
 	get_tree().current_scene.call_deferred("add_child", drop)
 
 func _get_weighted_random() -> String:
@@ -105,6 +105,8 @@ func _get_weighted_random() -> String:
 	return powerup_pool.keys()[0]
 
 func _on_powerup_collected(type: String) -> void:
+	Events.bonus_points_gained.emit(50) 
+	
 	if type in group_instant:
 		_apply_instant_powerup(type)
 	elif type in group_paddle:
@@ -117,6 +119,8 @@ func _apply_instant_powerup(type: String) -> void:
 		Events.life_gained.emit()
 	elif type == "multiball":
 		Events.multiball_activated.emit()
+	elif type == "level_skip":
+		Events.door_opened.emit()
 
 func _apply_paddle_powerup(type: String) -> void:
 	if active_paddle_powerup != "" and active_paddle_powerup != type:
@@ -184,6 +188,7 @@ func reset_all_powerups() -> void:
 	
 func _get_powerup_duration(type: String) -> float:
 	if type == "big_ball": return 15.0
+	if type == "magnet": return 15.0
 	return 10.0
 	
 func _on_level_ready(total_bricks: int) -> void:

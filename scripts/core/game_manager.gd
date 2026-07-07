@@ -11,6 +11,7 @@ func _ready() -> void:
 	Events.bonus_points_gained.connect(_on_bonus_points_gained)
 	Events.ball_lost.connect(_on_ball_lost)
 	Events.level_ready.connect(_on_level_ready)
+	Events.level_skip_entered.connect(_on_level_skip_entered)
 	Events.score_updated.emit.call_deferred(0)
 	Events.lives_updated.emit.call_deferred(3)
 	await get_tree().process_frame
@@ -43,6 +44,12 @@ func _on_brick_destroyed(points: int) -> void:
 	if bricks_remaining == 0:
 		LevelManager.unlock_next_level(LevelManager.current_level_index)
 		Events.level_cleared_start_anim.emit()
+
+func _on_level_skip_entered() -> void:
+	if not is_inside_tree(): return
+	bricks_remaining = -1
+	LevelManager.unlock_next_level(LevelManager.current_level_index)
+	Events.level_cleared_start_anim.emit()
 
 func _on_bonus_points_gained(points: int) -> void:
 	if not is_inside_tree(): return
@@ -91,10 +98,10 @@ func _on_multiball_activated() -> void:
 	if not is_inside_tree(): return
 	var paddle = get_tree().get_first_node_in_group("paddle")
 	if not is_instance_valid(paddle): return
-	var directions = [Vector2(-1, -1).normalized(), Vector2(1, -1).normalized()]
-	for dir in directions:
-		var ball = BallScene.instantiate()
-		ball.global_position = paddle.global_position - Vector2(0, 40)
-		ball.direction = dir
-		ball.is_launched = true
-		get_parent().call_deferred("add_child", ball)
+	var random_dir_x = -1.0 if randf() > 0.5 else 1.0
+	var dir = Vector2(random_dir_x, -1.0).normalized()
+	var ball = BallScene.instantiate()
+	ball.global_position = paddle.global_position - Vector2(0, 40)
+	ball.direction = dir
+	ball.is_launched = true
+	get_parent().call_deferred("add_child", ball)

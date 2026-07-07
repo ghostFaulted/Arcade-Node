@@ -29,3 +29,5 @@ signal paddle_magnet_state_changed(is_active: bool)
 signal ball_caught
 signal multiball_activated
 signal ball_aimed
+signal door_opened
+signal level_skip_entered
