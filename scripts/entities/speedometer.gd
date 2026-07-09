@@ -7,8 +7,7 @@ var paddle_width: float = 0.0
 var current_ratio: float = 0.0
 var is_slowed: bool = false
 
-const COLORS =[
-	Color.GREEN,
+const COLORS = [
 	Color.GREEN_YELLOW,
 	Color.YELLOW,
 	Color.ORANGE,
@@ -24,24 +23,31 @@ func _ready() -> void:
 	Events.ball_slow_state_changed.connect(_on_ball_slow_state_changed)
 	
 func _on_speed_updated(ratio: float) -> void:
-	current_ratio = ratio
+	current_ratio = clampf(ratio, 0.0, 1.0)
 	queue_redraw()
 	
 func _draw() -> void:
-	var segments = 5
+	var segments = 4
 	var segment_width = (paddle_width - ((segments - 1) * gap)) / segments
 	var start_x = -(paddle_width / 2.0)
+	
 	for i in range(segments):
 		var pos_x = start_x + (i * (segment_width + gap))
-		var rect = Rect2(pos_x, y_offset, segment_width, height)
+		var base_rect = Rect2(pos_x, y_offset, segment_width, height)
+		
+		draw_rect(base_rect, EMPTY_COLOR)
+		
 		if is_slowed:
-			draw_rect(rect, COLORS[0])
+			draw_rect(base_rect, Color.GREEN)
 		else:
-			var threshold = i * 0.25
-			if current_ratio >= threshold:
-				draw_rect(rect, COLORS[i])
-			else:
-				draw_rect(rect, EMPTY_COLOR)
+			var segment_start = float(i) * 0.25
+			var local_ratio = (current_ratio - segment_start) * 4.0
+			var fill_percent = clampf(local_ratio, 0.0, 1.0)
+			
+			if fill_percent > 0.0:
+				var fill_width = segment_width * fill_percent
+				var filled_rect = Rect2(pos_x, y_offset, fill_width, height)
+				draw_rect(filled_rect, COLORS[i])
 				
 func _on_paddle_size_changed(new_width: float) -> void:
 	paddle_width = new_width
