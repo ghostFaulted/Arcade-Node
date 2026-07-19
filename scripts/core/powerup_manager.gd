@@ -10,13 +10,14 @@ var max_on_screen: int = 3
 var powerup_pool = {
 	"slow_ball": 30,
 	"big_ball": 30,
+	"ghost_ball": 1000,
 	"multiball": 30,
 	"wide_paddle": 30,
 	"shield": 30,
 	"laser": 30,
 	"magnet": 30,
 	"extra_life": 5,
-	"level_skip": 2 
+	"level_skip": 2
 }
 
 var active_paddle_powerup: String = ""
@@ -26,7 +27,7 @@ var ball_timer: Timer
 var current_paddle_duration: float = 10.0
 var current_ball_duration: float = 10.0
 var group_paddle = ["wide_paddle", "shield", "laser", "magnet"]
-var group_ball = ["slow_ball", "big_ball"]
+var group_ball = ["slow_ball", "big_ball", "ghost_ball"]
 var group_instant = ["multiball", "extra_life", "level_skip"]
 var is_level_active: bool = false
 
@@ -81,15 +82,18 @@ func _spawn_powerup(pos: Vector2) -> void:
 	var drop = PowerUpScene.instantiate()
 	drop.type = chosen_type
 	drop.global_position = pos
+	
 	if chosen_type == "slow_ball": drop.modulate = Color.BLUE
 	elif chosen_type == "multiball": drop.modulate = Color.WHITE
 	elif chosen_type == "wide_paddle": drop.modulate = Color.GREEN
 	elif chosen_type == "extra_life": drop.modulate = Color.RED
 	elif chosen_type == "big_ball": drop.modulate = Color.ORANGE
+	elif chosen_type == "ghost_ball": drop.modulate = Color.VIOLET
 	elif chosen_type == "shield": drop.modulate = Color.CYAN
 	elif chosen_type == "laser": drop.modulate = Color.YELLOW
 	elif chosen_type == "magnet": drop.modulate = Color.PURPLE
 	elif chosen_type == "level_skip": drop.modulate = Color.GOLD
+	
 	get_tree().current_scene.call_deferred("add_child", drop)
 
 func _get_weighted_random() -> String:
@@ -147,6 +151,8 @@ func _apply_ball_powerup(type: String) -> void:
 		Events.ball_slow_state_changed.emit(true)
 	elif type == "big_ball":
 		Events.ball_big_state_changed.emit(true)
+	elif type == "ghost_ball":
+		Events.ball_ghost_state_changed.emit(true)
 
 func _on_paddle_timer_timeout() -> void:
 	_remove_paddle_powerup(active_paddle_powerup)
@@ -171,6 +177,8 @@ func _remove_ball_powerup(type: String) -> void:
 		Events.ball_slow_state_changed.emit(false)
 	elif type == "big_ball":
 		Events.ball_big_state_changed.emit(false)
+	elif type == "ghost_ball":
+		Events.ball_ghost_state_changed.emit(false)
 
 func reset_all_powerups() -> void:
 	if active_paddle_powerup != "":
@@ -189,6 +197,7 @@ func reset_all_powerups() -> void:
 func _get_powerup_duration(type: String) -> float:
 	if type == "big_ball": return 15.0
 	if type == "magnet": return 15.0
+	if type == "ghost_ball": return 15.0
 	return 10.0
 	
 func _on_level_ready(total_bricks: int) -> void:

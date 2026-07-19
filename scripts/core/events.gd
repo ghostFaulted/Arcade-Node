@@ -31,3 +31,4 @@ signal multiball_activated
 signal ball_aimed
 signal door_opened
 signal level_skip_entered
+signal ball_ghost_state_changed(is_active: bool)
