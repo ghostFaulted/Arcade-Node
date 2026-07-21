@@ -144,30 +144,31 @@ func _physics_process(delta: float) -> void:
 				continue
 				
 			if normal.y < -0.2 and direction.y > 0:
-				var offset = global_position.x - collider.global_position.x
-				var normalized_offset = clampf(offset / collider.half_width, -1.0, 1.0)
-				var bounce_angle = normalized_offset * MAX_BOUNCE_ANGLE
-				direction = Vector2.UP.rotated(bounce_angle).normalized()
 				_increase_global_speed(speed_step)
 			else:
 				var paddle_shape = collider.get_node("CollisionShape2D").shape
 				var paddle_top_y = collider.global_position.y - paddle_shape.radius
 				var ball_radius = $CollisionShape2D.shape.radius * visual_scale
 				global_position.y = paddle_top_y - ball_radius - 1.0
-				var offset_dir = sign(global_position.x - collider.global_position.x)
-				if offset_dir == 0: offset_dir = 1.0
-				direction = Vector2(offset_dir * 0.5, -1.0).normalized() 
+				
+			var offset = global_position.x - collider.global_position.x
+			var normalized_offset = clampf(offset / collider.half_width, -1.0, 1.0)
+			var bounce_angle = normalized_offset * MAX_BOUNCE_ANGLE
+			direction = Vector2.UP.rotated(bounce_angle).normalized() 
 		else:
+			if collider.is_in_group("brick"):
+				if abs(abs(normal.x) - abs(normal.y)) < 0.2:
+					var screen_center_x = get_viewport_rect().size.x / 2.0
+					var to_center = sign(screen_center_x - global_position.x)
+					if to_center == 0: to_center = 1.0
+					var bend_angle = deg_to_rad(2.5)
+					normal = normal.rotated(-to_center * sign(normal.y) * bend_angle).normalized()
+					
 			direction = direction.bounce(normal).normalized()
 			
 		if abs(direction.y) < 0.2:
 			var dir_sign = sign(direction.y) if direction.y != 0 else 1.0
 			direction.y = 0.2 * dir_sign
-			direction = direction.normalized()
-			
-		if abs(direction.x) < 0.02:
-			var noise = 0.05 if randf() > 0.5 else -0.05
-			direction.x += noise
 			direction = direction.normalized()
 			
 		if collider.has_method("take_damage"):

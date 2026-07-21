@@ -10,7 +10,7 @@ var max_on_screen: int = 3
 var powerup_pool = {
 	"slow_ball": 30,
 	"big_ball": 30,
-	"ghost_ball": 1000,
+	"ghost_ball": 30,
 	"multiball": 30,
 	"wide_paddle": 30,
 	"shield": 30,
